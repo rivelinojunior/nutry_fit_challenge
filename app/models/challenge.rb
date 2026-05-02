@@ -2,6 +2,9 @@ class Challenge < ApplicationRecord
   STATUSES = %w[draft published].freeze
 
   belongs_to :user
+  has_many :challenge_tasks, dependent: :destroy
+  has_many :participants, dependent: :destroy
+  has_many :users, through: :participants
 
   validates :name, :start_date, :end_date, :timezone, :status, presence: true
   validates :status, inclusion: { in: STATUSES }

@@ -1,6 +1,7 @@
 class Participant < ApplicationRecord
   belongs_to :user
   belongs_to :challenge
+  has_many :checkins, dependent: :destroy
 
   before_validation :set_joined_at
 

@@ -105,4 +105,10 @@ RSpec.describe Participant, type: :model do
 
     expect(association.macro).to eq(:belongs_to)
   end
+
+  it "has many checkins with dependent destroy" do
+    association = described_class.reflect_on_association(:checkins)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
+  end
 end

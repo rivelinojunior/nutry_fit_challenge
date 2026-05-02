@@ -31,4 +31,16 @@ RSpec.describe User, type: :model do
 
     expect(user.valid_password?("password123")).to be(true)
   end
+
+  it "has many challenges with dependent destroy" do
+    association = described_class.reflect_on_association(:challenges)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
+  end
+
+  it "has many participants with dependent destroy" do
+    association = described_class.reflect_on_association(:participants)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
+  end
 end

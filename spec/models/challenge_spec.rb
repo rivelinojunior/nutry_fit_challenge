@@ -112,4 +112,22 @@ RSpec.describe Challenge, type: :model do
 
     expect(association.macro).to eq(:belongs_to)
   end
+
+  it "has many challenge tasks with dependent destroy" do
+    association = described_class.reflect_on_association(:challenge_tasks)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
+  end
+
+  it "has many participants with dependent destroy" do
+    association = described_class.reflect_on_association(:participants)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
+  end
+
+  it "has many users through participants" do
+    association = described_class.reflect_on_association(:users)
+
+    expect(association).to have_attributes(macro: :has_many, options: include(through: :participants))
+  end
 end

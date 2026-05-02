@@ -1,5 +1,6 @@
 class ChallengeTask < ApplicationRecord
   belongs_to :challenge
+  has_many :checkins, dependent: :destroy
 
   validates :name, :points, :scheduled_on, presence: true
   validates :points, numericality: { only_integer: true, greater_than: 0 }, allow_blank: true

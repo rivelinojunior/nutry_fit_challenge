@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+  has_many :challenges, dependent: :destroy
+  has_many :participants, dependent: :destroy
+
   validates :name, presence: true
 
   # Include default devise modules. Others available are:
