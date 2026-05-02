@@ -75,8 +75,8 @@ Uma tarefa concreta em um dia específico.
 * description
 * points
 * scheduled_on (date)
-* start_time (optional)
-* end_time (optional)
+* allowed_start_time (optional)
+* allowed_end_time (optional)
 
 ---
 
