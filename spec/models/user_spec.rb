@@ -1,0 +1,34 @@
+require "rails_helper"
+
+RSpec.describe User, type: :model do
+  subject(:user) { build(:user) }
+
+  it "is valid with a name, email, and password" do
+    expect(user).to be_valid
+  end
+
+  it "requires a name" do
+    user.name = nil
+
+    expect(user).not_to be_valid
+  end
+
+  it "requires an email" do
+    user.email = nil
+
+    expect(user).not_to be_valid
+  end
+
+  it "requires a password with the default minimum length" do
+    user.password = "12345"
+    user.password_confirmation = "12345"
+
+    expect(user).not_to be_valid
+  end
+
+  it "authenticates with the Devise password" do
+    user = create(:user)
+
+    expect(user.valid_password?("password123")).to be(true)
+  end
+end
