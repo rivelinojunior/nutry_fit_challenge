@@ -1,0 +1,30 @@
+name: nutryfit-challenge
+
+services:
+  postgres:
+    image: postgres:18.1-alpine
+    container_name: nutryfit_challenge_postgres
+    environment:
+      POSTGRES_USER: nutry_fit_admin
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5437:5432"
+    volumes:
+      - nutryfit_challenge_postgres_data:/var/lib/postgresql
+    networks:
+      - nutryfit_challenge_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nutry_fit_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nutryfit_challenge_postgres_data:
+    driver: local
+
+networks:
+  nutryfit_challenge_network:
+    driver: bridge

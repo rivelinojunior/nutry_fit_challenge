@@ -207,8 +207,10 @@ cd nutry_fit_challenge
 bundle install
 yarn install
 
-rails db:create
-rails db:migrate
+cp .env.sample .env
+docker compose up -d postgres
+
+bin/rails db:prepare
 ```
 
 Rodar:
