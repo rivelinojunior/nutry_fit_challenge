@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_02_185351) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_02_224725) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -41,6 +41,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_185351) do
     t.index ["user_id"], name: "index_challenges_on_user_id"
   end
 
+  create_table "checkins", force: :cascade do |t|
+    t.bigint "challenge_task_id", null: false
+    t.datetime "checked_at"
+    t.datetime "created_at", null: false
+    t.bigint "participant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenge_task_id"], name: "index_checkins_on_challenge_task_id"
+    t.index ["participant_id", "challenge_task_id"], name: "index_checkins_on_participant_id_and_challenge_task_id", unique: true
+    t.index ["participant_id"], name: "index_checkins_on_participant_id"
+  end
+
   create_table "participants", force: :cascade do |t|
     t.bigint "challenge_id", null: false
     t.datetime "created_at", null: false
@@ -67,6 +78,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_185351) do
 
   add_foreign_key "challenge_tasks", "challenges"
   add_foreign_key "challenges", "users"
+  add_foreign_key "checkins", "challenge_tasks"
+  add_foreign_key "checkins", "participants"
   add_foreign_key "participants", "challenges"
   add_foreign_key "participants", "users"
 end
