@@ -21,6 +21,10 @@ Business rules should be kept out of controllers. Follow the README architecture
 
 Use standard Rails naming: singular models (`User`), plural controllers, snake_case files, and descriptive migration names. Follow RuboCop Rails Omakase; do not introduce local style exceptions unless they remove real friction. Prefer small controllers, explicit model validations, and service/process objects for multi-step business workflows. Keep locale strings in `config/locales`.
 
+## Ruby Conventions
+
+- **No defensive coercions** — do not wrap values in `Array()`, `Integer()`, `String()`, etc. Pass values as-is; let the receiver or its defaults handle nil.
+
 ## Testing Guidelines
 
 RSpec and FactoryBot are the test stack. Name specs `*_spec.rb` and mirror the application path, for example `spec/models/user_spec.rb` for `app/models/user.rb`. Add focused examples for validations, associations, process results, and controller/request behavior when those layers change. Run `bundle exec rspec` before opening a PR; run `bin/ci` when touching security-sensitive, dependency, or style-related code.
