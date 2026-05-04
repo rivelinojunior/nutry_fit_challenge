@@ -329,6 +329,10 @@ GEM
       ffi (~> 1.12)
       logger
     securerandom (0.4.1)
+    solid-process (0.6.0)
+      activemodel (>= 6.0)
+      solid-result (~> 2.0)
+    solid-result (2.0.0)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -418,6 +422,7 @@ DEPENDENCIES
   rails (~> 8.1.3)
   rspec-rails (~> 8.0)
   rubocop-rails-omakase
+  solid-process (~> 0.6.0)
   solid_cable
   solid_cache
   solid_queue
@@ -550,6 +555,8 @@ CHECKSUMS
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   ruby-vips (2.3.0) sha256=e685ec02c13969912debbd98019e50492e12989282da5f37d05f5471442f5374
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
+  solid-process (0.6.0) sha256=7776aab636b762d855b3301805274871549aa481d5eb4f7809ec9bbde4ff2a95
+  solid-result (2.0.0) sha256=fda0bc1069e6d3e04ae9655ceaaa09b0c75f6e5dce1967ce82bd250e6b5ccf97
   solid_cable (3.0.12) sha256=a168a54731a455d5627af48d8441ea3b554b8c1f6e6cd6074109de493e6b0460
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
   solid_queue (1.4.0) sha256=e6a18d196f0b27cb6e3c77c5b31258b05fb634f8ed64fb1866ed164047216c2a
