@@ -1,5 +1,8 @@
 "pt-BR":
   hello: "Olá mundo"
+  mailer_layout:
+    security_notice: "Mensagem automática do Nutry.fit Challenge."
+    link_fallback: "Se o botão não funcionar, copie e cole o link no navegador."
   activerecord:
     models:
       user: "usuário"

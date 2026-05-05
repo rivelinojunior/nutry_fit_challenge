@@ -1,0 +1,23 @@
+<p style="margin:0 0 10px;font-size:12px;line-height:16px;font-weight:700;color:#1e970d;text-align:center;">
+  <%= t("devise.mailer.email_changed.eyebrow") %>
+</p>
+
+<h1 class="nutry-mail-headline" style="margin:0 0 20px;font-size:32px;line-height:38px;font-weight:800;letter-spacing:0;color:#111827;text-align:center;">
+  <%= t("devise.mailer.email_changed.title") %>
+</h1>
+
+<% if @resource.try(:unconfirmed_email?) %>
+  <p style="margin:0 0 18px;font-size:15px;line-height:26px;color:#374151;text-align:center;">
+    <%= t("devise.mailer.email_changed.pending_body_html", email: @resource.unconfirmed_email) %>
+  </p>
+  <p style="margin:0;font-size:12px;line-height:20px;color:#6b7280;text-align:center;">
+    <%= t("devise.mailer.email_changed.pending_footer") %>
+  </p>
+<% else %>
+  <p style="margin:0 0 18px;font-size:15px;line-height:26px;color:#374151;text-align:center;">
+    <%= t("devise.mailer.email_changed.confirmed_body_html", email: @resource.email) %>
+  </p>
+  <p style="margin:0;font-size:12px;line-height:20px;color:#6b7280;text-align:center;">
+    <%= t("devise.mailer.email_changed.confirmed_footer") %>
+  </p>
+<% end %>
