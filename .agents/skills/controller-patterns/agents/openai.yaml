@@ -1,0 +1,4 @@
+interface:
+  display_name: "Controller Patterns"
+  short_description: "Design thin Rails controllers for Nutry.fit"
+  default_prompt: "Use $controller-patterns when designing, implementing, or reviewing Rails controllers, routes, endpoints, request specs, and Solid::Process HTTP response handling."
