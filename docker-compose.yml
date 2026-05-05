@@ -21,8 +21,25 @@ services:
       timeout: 5s
       retries: 5
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: nutryfit_challenge_mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: 5000
+    volumes:
+      - nutryfit_challenge_mailpit_data:/data
+    networks:
+      - nutryfit_challenge_network
+    restart: unless-stopped
+
 volumes:
   nutryfit_challenge_postgres_data:
+    driver: local
+  nutryfit_challenge_mailpit_data:
     driver: local
 
 networks:
