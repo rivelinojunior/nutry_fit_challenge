@@ -1,0 +1,4 @@
+interface:
+  display_name: "DaisyUI Frontend Patterns"
+  short_description: "Build Rails Hotwire DaisyUI UI for Desafio Nutry.fit"
+  default_prompt: "Use $daisyui-frontend-patterns when implementing or changing Rails views, Hotwire behavior, Tailwind/DaisyUI styling, or UI copy so the work follows DESIGN.md."

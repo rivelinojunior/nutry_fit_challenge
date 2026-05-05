@@ -6,6 +6,10 @@ This is a Rails 8 application for a Nutry.fit challenge MVP. Core application co
 
 Business rules should be kept out of controllers. Follow the README architecture: put workflow/domain logic in `app/processes` when adding non-trivial behavior, with explicit input, injectable dependencies, and structured results.
 
+## UI & Design Guidance
+
+When implementing or changing UI, read `DESIGN.md` first and follow its AI-facing instructions. This applies to Rails views, layouts, partials, Hotwire controllers, Tailwind/DaisyUI styling, copy, and participant/admin flow changes. Keep UI work aligned with the Rails + Hotwire + DaisyUI stack; do not introduce React, TSX, Next.js, shadcn, frontend-only architecture, or out-of-scope meal-plan/grocery/nutrition UI unless the product scope explicitly changes.
+
 ## Build, Test, and Development Commands
 
 - `bundle install`: install Ruby dependencies.
