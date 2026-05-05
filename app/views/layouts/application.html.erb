@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>" data-theme="nutryfit">
   <head>
     <title><%= content_for(:title) || "Nutry Fit Challenge" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,13 +18,15 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="min-h-screen bg-base-200 font-sans text-base-content antialiased">
+    <main class="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6">
       <%= yield %>
     </main>
   </body>
