@@ -11,7 +11,7 @@ module Admin
 
       case result
       in Solid::Success[type: :created]
-        redirect_to admin_challenge_tasks_path, notice: "Tarefas geradas com sucesso."
+        redirect_to admin_challenge_tasks_path(@challenge), notice: "Tarefas geradas com sucesso."
       in Solid::Failure[type: :invalid_input]
         render_index_with_errors(result[:input].errors.full_messages)
       in Solid::Failure[type: :challenge_not_found | :already_started | :specific_date_out_of_range | :validation_failed]
@@ -26,7 +26,7 @@ module Admin
 
       case result
       in Solid::Success[type: :removed]
-        redirect_to admin_challenge_tasks_path, notice: "Tarefa removida."
+        redirect_to admin_challenge_tasks_path(@challenge), notice: "Tarefa removida."
       in Solid::Failure[type: :invalid_input]
         render_index_with_errors(result[:input].errors.full_messages)
       in Solid::Failure[type: :challenge_task_not_found | :already_started]
@@ -39,7 +39,7 @@ module Admin
 
       case result
       in Solid::Success[type: :published]
-        redirect_to admin_challenge_tasks_path, notice: "Desafio publicado."
+        redirect_to admin_challenge_tasks_path(@challenge), notice: "Desafio publicado."
       in Solid::Failure[type: :invalid_input]
         render_index_with_errors(result[:input].errors.full_messages)
       in Solid::Failure[type: :challenge_not_found]
@@ -52,7 +52,7 @@ module Admin
     private
 
     def set_challenge
-      @challenge = current_user.challenges.order(created_at: :desc).first
+      @challenge = current_user.challenges.find_by(id: params[:challenge_id])
     end
 
     def prepare_view_state(errors = [])

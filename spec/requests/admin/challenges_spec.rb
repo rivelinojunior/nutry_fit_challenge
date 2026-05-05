@@ -53,7 +53,7 @@ RSpec.describe "Admin::Challenges" do
     it "redirects to the challenge tasks screen" do
       post admin_challenge_path, params: { challenge: challenge_attributes }
 
-      expect(response).to redirect_to(admin_challenge_tasks_path)
+      expect(response).to redirect_to(admin_challenge_tasks_path(Challenge.last))
     end
 
     it "renders errors when the process rejects the attributes" do
@@ -90,7 +90,7 @@ RSpec.describe "Admin::Challenges" do
         }
       }
 
-      expect(response).to redirect_to(admin_challenge_tasks_path)
+      expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
       expect(challenge.reload).to have_attributes(name: "Desafio atualizado", description: "Checklist atualizado")
     end
 

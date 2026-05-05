@@ -38,7 +38,7 @@
                 </div>
 
                 <%= button_to "Remover",
-                              admin_challenge_task_path(task),
+                              admin_challenge_task_path(challenge, task),
                               method: :delete,
                               disabled: challenge_started,
                               data: { turbo_confirm: "Remover esta tarefa?" },

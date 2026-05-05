@@ -7,14 +7,16 @@ RSpec.describe "Admin challenge tasks" do
     sign_in user
   end
 
-  describe "GET /admin/challenge/tasks" do
+  describe "GET /admin/challenge/:challenge_id/tasks" do
     context "without an authenticated user" do
+      let!(:challenge) { create(:challenge, user:) }
+
       before do
         sign_out user
       end
 
       it "redirects to sign in" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -22,9 +24,10 @@ RSpec.describe "Admin challenge tasks" do
 
     context "when the user is not an admin" do
       let(:user) { create(:user) }
+      let!(:challenge) { create(:challenge, user:) }
 
       it "returns forbidden" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response).to have_http_status(:forbidden)
       end
@@ -35,40 +38,50 @@ RSpec.describe "Admin challenge tasks" do
       let!(:task) { create(:challenge_task, challenge:, scheduled_on: challenge.start_date, name: "Caminhar") }
 
       it "shows the generation form" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response.body).to include("Gerar tarefas")
       end
 
       it "shows the generated task list" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response.body).to include("Tarefas geradas")
       end
 
       it "shows the generated task name" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response.body).to include("Caminhar")
       end
 
       it "shows the grouped task date" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(challenge)
 
         expect(response.body).to include(task.scheduled_on.strftime("%d/%m/%Y"))
       end
+
+      it "loads the challenge from the route id" do
+        other_challenge = create(:challenge, user:, name: "Outro desafio")
+        create(:challenge_task, challenge: other_challenge, name: "Outra tarefa")
+
+        get admin_challenge_tasks_path(challenge)
+
+        expect(response.body).to include("Caminhar")
+        expect(response.body).not_to include("Outra tarefa")
+      end
     end
 
-    context "without a challenge" do
+    context "with an unknown challenge id" do
       it "shows an empty state" do
-        get admin_challenge_tasks_path
+        get admin_challenge_tasks_path(0)
 
         expect(response.body).to include("Nenhum desafio encontrado")
       end
     end
   end
 
-  describe "POST /admin/challenge/tasks" do
+  describe "POST /admin/challenge/:challenge_id/tasks" do
     let!(:challenge) { create(:challenge, user:, start_date:, end_date:) }
     let(:start_date) { Date.current + 1.day }
     let(:end_date) { Date.current + 3.days }
@@ -89,14 +102,14 @@ RSpec.describe "Admin challenge tasks" do
 
       it "generates daily tasks" do
         expect do
-          post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+          post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
         end.to change(ChallengeTask, :count).by(3)
       end
 
       it "redirects to the task list" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
-        expect(response).to redirect_to(admin_challenge_tasks_path)
+        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
       end
     end
 
@@ -119,7 +132,7 @@ RSpec.describe "Admin challenge tasks" do
       end
 
       it "generates tasks on selected weekdays" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
         expect(challenge.challenge_tasks.order(:scheduled_on).pluck(:scheduled_on)).to eq([ monday, monday + 2.days ])
       end
@@ -140,7 +153,7 @@ RSpec.describe "Admin challenge tasks" do
       end
 
       it "generates the specific-date task" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
         expect(challenge.challenge_tasks.pluck(:scheduled_on)).to contain_exactly(challenge.start_date)
       end
@@ -161,13 +174,13 @@ RSpec.describe "Admin challenge tasks" do
       end
 
       it "returns unprocessable entity" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it "shows validation errors" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
         expect(response.body).to include("Name não pode ficar em branco")
       end
@@ -191,26 +204,26 @@ RSpec.describe "Admin challenge tasks" do
 
       it "does not generate tasks" do
         expect do
-          post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+          post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
         end.not_to change(ChallengeTask, :count)
       end
 
       it "shows the process error" do
-        post admin_challenge_tasks_path, params: { challenge_task: challenge_task_params }
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
 
         expect(response.body).to include("Challenge has already started")
       end
     end
   end
 
-  describe "DELETE /admin/challenge/tasks/:id" do
+  describe "DELETE /admin/challenge/:challenge_id/tasks/:id" do
     context "when the challenge has not started" do
       let!(:challenge) { create(:challenge, user:, start_date: Date.current + 1.day) }
       let!(:task) { create(:challenge_task, challenge:) }
 
       it "removes the task" do
         expect do
-          delete admin_challenge_task_path(task)
+          delete admin_challenge_task_path(challenge, task)
         end.to change(ChallengeTask, :count).by(-1)
       end
     end
@@ -221,36 +234,37 @@ RSpec.describe "Admin challenge tasks" do
 
       it "does not remove the task" do
         expect do
-          delete admin_challenge_task_path(task)
+          delete admin_challenge_task_path(challenge, task)
         end.not_to change(ChallengeTask, :count)
       end
 
       it "shows the process error" do
-        delete admin_challenge_task_path(task)
+        delete admin_challenge_task_path(challenge, task)
 
         expect(response.body).to include("Challenge has already started")
       end
     end
 
     context "when the task belongs to another user" do
+      let!(:challenge) { create(:challenge, user:) }
       let!(:other_challenge) { create(:challenge) }
       let!(:task) { create(:challenge_task, challenge: other_challenge) }
 
       it "does not remove the task" do
         expect do
-          delete admin_challenge_task_path(task)
+          delete admin_challenge_task_path(challenge, task)
         end.not_to change(ChallengeTask, :count)
       end
 
       it "shows not found" do
-        delete admin_challenge_task_path(task)
+        delete admin_challenge_task_path(challenge, task)
 
         expect(response.body).to include("Tarefa não encontrada")
       end
     end
   end
 
-  describe "POST /admin/challenge/tasks/publish" do
+  describe "POST /admin/challenge/:challenge_id/tasks/publish" do
     context "when at least one task exists" do
       let!(:challenge) { create(:challenge, user:) }
 
@@ -259,13 +273,13 @@ RSpec.describe "Admin challenge tasks" do
       end
 
       it "redirects to the task list" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path)
+        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
       end
 
       it "publishes the challenge" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
         expect(challenge.reload.status).to eq("published")
       end
@@ -275,13 +289,13 @@ RSpec.describe "Admin challenge tasks" do
       let!(:challenge) { create(:challenge, user:) }
 
       it "returns unprocessable entity" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it "shows the process error" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
         expect(response.body).to include("Challenge must have tasks before publishing")
       end
@@ -300,13 +314,13 @@ RSpec.describe "Admin challenge tasks" do
       end
 
       it "returns unprocessable entity" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it "shows the process error" do
-        post admin_publish_challenge_tasks_path
+        post admin_publish_challenge_tasks_path(challenge)
 
         expect(response.body).to include("Challenge must have a code before publishing")
       end

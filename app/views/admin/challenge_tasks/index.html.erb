@@ -57,7 +57,7 @@
       </p>
 
       <%= button_to "Publicar desafio",
-                    admin_publish_challenge_tasks_path,
+                    @challenge.present? ? admin_publish_challenge_tasks_path(@challenge) : "#",
                     method: :post,
                     disabled: @challenge.blank? || @tasks_by_date.blank? || @challenge.status == "published",
                     data: { turbo_confirm: "Publicar este desafio com as tarefas atuais?" },
@@ -65,5 +65,5 @@
     </aside>
   </div>
 
-  <%= render "task_list", tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
+  <%= render "task_list", challenge: @challenge, tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
 </section>

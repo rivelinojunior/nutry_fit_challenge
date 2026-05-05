@@ -4,7 +4,7 @@
     Defina uma tarefa e escolha como ela será materializada no calendário do desafio.
   </p>
 
-  <%= form_with scope: :challenge_task, url: admin_challenge_tasks_path, method: :post, class: "mt-5 grid gap-4" do |form| %>
+  <%= form_with scope: :challenge_task, url: challenge.present? ? admin_challenge_tasks_path(challenge) : "#", method: :post, class: "mt-5 grid gap-4" do |form| %>
     <fieldset class="grid gap-4" <%= "disabled" if challenge.blank? || challenge_started %>>
       <div>
         <%= form.label :name, "Nome", class: "label" %>

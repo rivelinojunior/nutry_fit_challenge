@@ -8,8 +8,8 @@ module Admin
 
     def create
       case Admin::CreateChallengeProcess.call(user: current_user, **challenge_params)
-      in Solid::Success[type: :created]
-        redirect_to admin_challenge_tasks_path, notice: "Desafio criado. Agora defina as tarefas."
+      in Solid::Success[type: :created, value: { challenge: }]
+        redirect_to admin_challenge_tasks_path(challenge), notice: "Desafio criado. Agora defina as tarefas."
       in Solid::Failure[type: :validation_failed, value: { challenge: }]
         @challenge = challenge
         render :new, status: :unprocessable_entity
@@ -28,8 +28,8 @@ module Admin
       return redirect_to new_admin_challenge_path, alert: "Crie o desafio antes de editar." unless @challenge
 
       case Admin::UpdateChallengeProcess.call(challenge_id: @challenge.id, **challenge_params, timezone: @challenge.timezone)
-      in Solid::Success[type: :updated]
-        redirect_to admin_challenge_tasks_path, notice: "Desafio atualizado."
+      in Solid::Success[type: :updated, value: { challenge: }]
+        redirect_to admin_challenge_tasks_path(challenge), notice: "Desafio atualizado."
       in Solid::Failure[type: :validation_failed, value: { challenge: }]
         @challenge = challenge
         render :edit, status: :unprocessable_entity
