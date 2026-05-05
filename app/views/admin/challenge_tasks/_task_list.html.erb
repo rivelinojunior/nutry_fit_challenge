@@ -1,0 +1,53 @@
+<section class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
+  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-lg font-semibold">Tarefas geradas</h2>
+      <p class="text-sm text-base-content/70">Agrupadas pela data em que ficarão disponíveis.</p>
+    </div>
+  </div>
+
+  <% if tasks_by_date.blank? %>
+    <div class="mt-5 rounded-lg border border-dashed border-base-300 p-6 text-center text-sm text-base-content/70">
+      Nenhuma tarefa gerada ainda.
+    </div>
+  <% else %>
+    <div class="mt-5 space-y-5">
+      <% tasks_by_date.each do |scheduled_on, tasks| %>
+        <section class="rounded-lg border border-base-300">
+          <header class="flex items-center justify-between border-b border-base-300 px-4 py-3">
+            <h3 class="font-medium"><%= scheduled_on.strftime("%d/%m/%Y") %></h3>
+            <span class="badge badge-outline"><%= pluralize(tasks.size, "tarefa", "tarefas") %></span>
+          </header>
+
+          <div class="divide-y divide-base-300">
+            <% tasks.each do |task| %>
+              <article class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h4 class="font-medium"><%= task.name %></h4>
+                    <span class="badge badge-success badge-outline"><%= task.points %> pts</span>
+                  </div>
+                  <% if task.description.present? %>
+                    <p class="mt-1 text-sm text-base-content/70"><%= task.description %></p>
+                  <% end %>
+                  <% if task.allowed_start_time.present? && task.allowed_end_time.present? %>
+                    <p class="mt-1 text-xs text-base-content/60">
+                      <%= task.allowed_start_time.strftime("%H:%M") %> até <%= task.allowed_end_time.strftime("%H:%M") %>
+                    </p>
+                  <% end %>
+                </div>
+
+                <%= button_to "Remover",
+                              admin_challenge_task_path(task),
+                              method: :delete,
+                              disabled: challenge_started,
+                              data: { turbo_confirm: "Remover esta tarefa?" },
+                              class: "btn btn-error btn-outline btn-sm rounded-full sm:self-center" %>
+              </article>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+    </div>
+  <% end %>
+</section>

@@ -1,5 +1,21 @@
 Rails.application.routes.draw do
   devise_for :users
+
+  namespace :admin do
+    resource :challenge, only: %i[new create edit update]
+    get "challenge/tasks", to: "challenge_tasks#index"
+    post "challenge/tasks", to: "challenge_tasks#create", as: nil
+    post "challenge/tasks/publish", to: "challenge_tasks#publish", as: :publish_challenge_tasks
+    delete "challenge/tasks/:id", to: "challenge_tasks#destroy", as: :challenge_task
+  end
+
+  get "join", to: "participants#join", as: :join
+  post "join", to: "participants#create"
+  get "participants/:id/waiting-room", to: "participants#waiting_room", as: :participant_waiting_room
+  get "participants/:id/dashboard", to: "participants#dashboard", as: :participant_dashboard
+
+  resource :challenge_participant, only: %i[new create]
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -10,6 +26,5 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  root "participants#join"
 end

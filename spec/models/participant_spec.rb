@@ -14,7 +14,7 @@ RSpec.describe Participant, type: :model do
       it "adds a user error" do
         participant.validate
 
-        expect(participant.errors[:user]).to include("must exist")
+        expect(participant.errors.of_kind?(:user, :blank)).to be(true)
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe Participant, type: :model do
       it "adds a challenge error" do
         participant.validate
 
-        expect(participant.errors[:challenge]).to include("must exist")
+        expect(participant.errors.of_kind?(:challenge, :blank)).to be(true)
       end
     end
 
@@ -65,7 +65,7 @@ RSpec.describe Participant, type: :model do
       it "adds a user error" do
         participant.validate
 
-        expect(participant.errors[:user_id]).to include("has already been taken")
+        expect(participant.errors.of_kind?(:user_id, :taken)).to be(true)
       end
     end
 

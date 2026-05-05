@@ -14,7 +14,7 @@ RSpec.describe Checkin, type: :model do
       it "adds a participant error" do
         checkin.validate
 
-        expect(checkin.errors[:participant]).to include("must exist")
+        expect(checkin.errors.of_kind?(:participant, :blank)).to be(true)
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe Checkin, type: :model do
       it "adds a challenge task error" do
         checkin.validate
 
-        expect(checkin.errors[:challenge_task]).to include("must exist")
+        expect(checkin.errors.of_kind?(:challenge_task, :blank)).to be(true)
       end
     end
 
@@ -62,7 +62,7 @@ RSpec.describe Checkin, type: :model do
       it "adds a challenge task error" do
         checkin.validate
 
-        expect(checkin.errors[:challenge_task_id]).to include("has already been taken")
+        expect(checkin.errors.of_kind?(:challenge_task_id, :taken)).to be(true)
       end
     end
 

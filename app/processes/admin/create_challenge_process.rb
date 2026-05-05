@@ -26,7 +26,8 @@ module Admin
         start_date: attributes[:start_date],
         end_date: attributes[:end_date],
         timezone: attributes[:timezone],
-        status: DEFAULT_STATUS
+        status: DEFAULT_STATUS,
+        challenge_code: deps.challenge_model.generate_unique_challenge_code
       )
 
       if challenge.persisted?

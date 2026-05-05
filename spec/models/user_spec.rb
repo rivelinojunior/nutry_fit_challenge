@@ -53,4 +53,20 @@ RSpec.describe User, type: :model do
 
     expect(association).to have_attributes(macro: :has_many, options: include(dependent: :destroy))
   end
+
+  describe "#admin?" do
+    context "when the user role is admin" do
+      subject(:user) { build(:user, :admin) }
+
+      it "returns true" do
+        expect(user.admin?).to be(true)
+      end
+    end
+
+    context "when the user role is not admin" do
+      it "returns false" do
+        expect(user.admin?).to be(false)
+      end
+    end
+  end
 end

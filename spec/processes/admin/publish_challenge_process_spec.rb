@@ -39,6 +39,22 @@ RSpec.describe Admin::PublishChallengeProcess do
       end
     end
 
+    context "when the challenge has no challenge code" do
+      before do
+        create(:challenge_task, challenge:)
+        allow(challenge).to receive(:challenge_code).and_return(nil)
+        allow(Challenge).to receive(:find_by).with(id: challenge_id).and_return(challenge)
+      end
+
+      it "returns a missing challenge code failure" do
+        expect(result).to be_failure(:missing_challenge_code)
+      end
+
+      it "returns a clear error" do
+        expect(result[:errors]).to contain_exactly("Challenge must have a code before publishing")
+      end
+    end
+
     context "when the challenge is already published" do
       let(:challenge) { create(:challenge, status: "published") }
 

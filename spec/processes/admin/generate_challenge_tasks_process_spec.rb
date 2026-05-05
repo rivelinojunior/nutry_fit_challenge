@@ -200,7 +200,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:challenge_id]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:challenge_id, :blank)).to be(true)
       end
     end
 
@@ -212,7 +212,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:name]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:name, :blank)).to be(true)
       end
 
       it "does not create tasks" do
@@ -228,7 +228,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:points]).to include("must be greater than 0")
+        expect(result[:input].errors.of_kind?(:points, :greater_than)).to be(true)
       end
 
       it "does not create tasks" do
@@ -244,7 +244,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:recurrence_type]).to include("is not included in the list")
+        expect(result[:input].errors.of_kind?(:recurrence_type, :inclusion)).to be(true)
       end
     end
 

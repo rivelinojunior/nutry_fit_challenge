@@ -166,7 +166,7 @@ RSpec.describe Checkins::PerformCheckinProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:challenge_id]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:challenge_id, :blank)).to be(true)
       end
     end
 
@@ -178,7 +178,7 @@ RSpec.describe Checkins::PerformCheckinProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:participant_id]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:participant_id, :blank)).to be(true)
       end
     end
 
@@ -190,7 +190,7 @@ RSpec.describe Checkins::PerformCheckinProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:challenge_task_id]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:challenge_task_id, :blank)).to be(true)
       end
     end
 
@@ -203,7 +203,7 @@ RSpec.describe Checkins::PerformCheckinProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:checked_at]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:checked_at, :blank)).to be(true)
       end
     end
 

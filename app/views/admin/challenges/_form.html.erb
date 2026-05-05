@@ -1,0 +1,81 @@
+<section class="mx-auto w-full max-w-3xl py-4 sm:py-8">
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-sm font-semibold text-primary"><%= eyebrow %></p>
+      <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content sm:text-3xl"><%= title %></h1>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-base-content/70"><%= description %></p>
+    </div>
+
+    <% if challenge.persisted? %>
+      <div class="flex flex-wrap gap-2">
+        <span class="badge badge-outline mt-1 shrink-0 capitalize"><%= challenge.status %></span>
+        <span class="badge badge-primary mt-1 shrink-0 font-mono"><%= challenge.challenge_code %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <% if flash[:notice].present? || flash[:alert].present? %>
+    <div class="mb-5 space-y-3">
+      <% if flash[:notice].present? %>
+        <div class="alert alert-success"><%= flash[:notice] %></div>
+      <% end %>
+
+      <% if flash[:alert].present? %>
+        <div class="alert alert-error"><%= flash[:alert] %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="nutry-card p-5 sm:p-6">
+    <% if challenge.errors.any? %>
+      <div class="alert alert-error mb-5 items-start">
+        <div>
+          <p class="font-semibold">Revise os campos do desafio.</p>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm">
+            <% challenge.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <%= form_with model: challenge, url: admin_challenge_path, method: (challenge.persisted? ? :patch : :post), class: "space-y-5" do |form| %>
+      <div>
+        <%= form.label :name, "Nome", class: "label pb-2 text-sm font-medium" %>
+        <%= form.text_field :name,
+          autofocus: true,
+          autocomplete: "off",
+          placeholder: "Desafio de Maio",
+          class: "input input-bordered w-full #{'input-error' if challenge.errors[:name].any?}" %>
+      </div>
+
+      <div>
+        <%= form.label :description, "Descrição", class: "label pb-2 text-sm font-medium" %>
+        <%= form.text_area :description,
+          rows: 4,
+          placeholder: "Explique o objetivo do desafio e como a comunidade vai acompanhar a consistência.",
+          class: "textarea textarea-bordered w-full #{'textarea-error' if challenge.errors[:description].any?}" %>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= form.label :start_date, "Data de início", class: "label pb-2 text-sm font-medium" %>
+          <%= form.date_field :start_date,
+            class: "input input-bordered w-full #{'input-error' if challenge.errors[:start_date].any?}" %>
+        </div>
+
+        <div>
+          <%= form.label :end_date, "Data de fim", class: "label pb-2 text-sm font-medium" %>
+          <%= form.date_field :end_date,
+            class: "input input-bordered w-full #{'input-error' if challenge.errors[:end_date].any?}" %>
+        </div>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <%= link_to "Cancelar", edit_admin_challenge_path, class: "btn btn-ghost rounded-full" if challenge.persisted? %>
+        <%= form.submit submit_label, class: "btn nutry-cta-gradient rounded-full sm:min-w-48" %>
+      </div>
+    <% end %>
+  </div>
+</section>

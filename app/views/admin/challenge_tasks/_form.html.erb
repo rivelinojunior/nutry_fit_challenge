@@ -1,0 +1,70 @@
+<section class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
+  <h2 class="text-lg font-semibold">Gerar tarefas</h2>
+  <p class="mt-1 text-sm text-base-content/70">
+    Defina uma tarefa e escolha como ela será materializada no calendário do desafio.
+  </p>
+
+  <%= form_with scope: :challenge_task, url: admin_challenge_tasks_path, method: :post, class: "mt-5 grid gap-4" do |form| %>
+    <fieldset class="grid gap-4" <%= "disabled" if challenge.blank? || challenge_started %>>
+      <div>
+        <%= form.label :name, "Nome", class: "label" %>
+        <%= form.text_field :name, value: task_form["name"], class: "input input-bordered w-full", required: true %>
+      </div>
+
+      <div>
+        <%= form.label :description, "Descrição", class: "label" %>
+        <%= form.text_area :description, value: task_form["description"], rows: 3, class: "textarea textarea-bordered w-full" %>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <%= form.label :points, "Pontos", class: "label" %>
+          <%= form.number_field :points, value: task_form["points"], min: 1, class: "input input-bordered w-full", required: true %>
+        </div>
+
+        <div>
+          <%= form.label :start_time, "Início", class: "label" %>
+          <%= form.time_field :start_time, value: task_form["start_time"], class: "input input-bordered w-full" %>
+        </div>
+
+        <div>
+          <%= form.label :end_time, "Fim", class: "label" %>
+          <%= form.time_field :end_time, value: task_form["end_time"], class: "input input-bordered w-full" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :recurrence_type, "Recorrência", class: "label" %>
+        <%= form.select :recurrence_type,
+                        options_for_select([ [ "Todos os dias", "daily" ], [ "Dias da semana", "weekdays" ], [ "Data específica", "specific_date" ] ], task_form["recurrence_type"]),
+                        {},
+                        class: "select select-bordered w-full" %>
+      </div>
+
+      <div>
+        <span class="label">Dias da semana</span>
+        <div class="grid gap-2 sm:grid-cols-4">
+          <% [ [ "Dom", 0 ], [ "Seg", 1 ], [ "Ter", 2 ], [ "Qua", 3 ], [ "Qui", 4 ], [ "Sex", 5 ], [ "Sáb", 6 ] ].each do |label, value| %>
+            <label class="flex items-center gap-2 rounded-md border border-base-300 px-3 py-2 text-sm">
+              <%= check_box_tag "challenge_task[weekdays][]", value, task_form.fetch("weekdays", []).map(&:to_s).include?(value.to_s), class: "checkbox checkbox-primary checkbox-sm" %>
+              <span><%= label %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :specific_date, "Data específica", class: "label" %>
+        <%= form.date_field :specific_date, value: task_form["specific_date"], min: challenge&.start_date, max: challenge&.end_date, class: "input input-bordered w-full" %>
+      </div>
+    </fieldset>
+
+    <% if challenge_started %>
+      <p class="text-sm text-warning">O desafio já começou. Não é possível gerar novas tarefas.</p>
+    <% elsif challenge.blank? %>
+      <p class="text-sm text-warning">Nenhum desafio encontrado para este usuário.</p>
+    <% end %>
+
+    <%= form.submit "Gerar tarefas", disabled: challenge.blank? || challenge_started, class: "btn btn-primary rounded-full sm:w-fit" %>
+  <% end %>
+</section>

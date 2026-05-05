@@ -44,6 +44,20 @@ RSpec.describe Admin::CreateChallengeProcess do
       it "applies the default timezone" do
         expect(result[:challenge]).to have_attributes(timezone: "America/Sao_Paulo")
       end
+
+      it "assigns a valid challenge code" do
+        expect(result[:challenge].challenge_code).to match(/\A[A-Z0-9]{6,8}\z/)
+      end
+    end
+
+    context "when the generator returns a challenge code" do
+      before do
+        allow(Challenge).to receive(:generate_unique_challenge_code).and_return("UNIQUE1")
+      end
+
+      it "uses the generated challenge code" do
+        expect(result[:challenge]).to have_attributes(challenge_code: "UNIQUE1")
+      end
     end
 
     context "with an invalid date range" do

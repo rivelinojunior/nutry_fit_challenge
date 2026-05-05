@@ -14,7 +14,7 @@ RSpec.describe Challenge, type: :model do
       it "adds a user error" do
         challenge.validate
 
-        expect(challenge.errors[:user]).to include("must exist")
+        expect(challenge.errors.of_kind?(:user, :blank)).to be(true)
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe Challenge, type: :model do
       it "adds a name error" do
         challenge.validate
 
-        expect(challenge.errors[:name]).to include("can't be blank")
+        expect(challenge.errors.of_kind?(:name, :blank)).to be(true)
       end
     end
 
@@ -34,7 +34,7 @@ RSpec.describe Challenge, type: :model do
       it "adds a start date error" do
         challenge.validate
 
-        expect(challenge.errors[:start_date]).to include("can't be blank")
+        expect(challenge.errors.of_kind?(:start_date, :blank)).to be(true)
       end
     end
 
@@ -44,7 +44,7 @@ RSpec.describe Challenge, type: :model do
       it "adds an end date error" do
         challenge.validate
 
-        expect(challenge.errors[:end_date]).to include("can't be blank")
+        expect(challenge.errors.of_kind?(:end_date, :blank)).to be(true)
       end
     end
 
@@ -54,7 +54,7 @@ RSpec.describe Challenge, type: :model do
       it "adds a timezone error" do
         challenge.validate
 
-        expect(challenge.errors[:timezone]).to include("can't be blank")
+        expect(challenge.errors.of_kind?(:timezone, :blank)).to be(true)
       end
     end
 
@@ -64,7 +64,50 @@ RSpec.describe Challenge, type: :model do
       it "adds a status error" do
         challenge.validate
 
-        expect(challenge.errors[:status]).to include("can't be blank")
+        expect(challenge.errors.of_kind?(:status, :blank)).to be(true)
+      end
+    end
+
+    context "without a challenge code" do
+      subject(:challenge) { build(:challenge, challenge_code: nil) }
+
+      it "generates a challenge code" do
+        challenge.validate
+
+        expect(challenge.challenge_code).to match(/\A[A-Z0-9]{6,8}\z/)
+      end
+    end
+
+    context "with a duplicate challenge code" do
+      before do
+        create(:challenge, challenge_code: "ABC123")
+        challenge.challenge_code = "ABC123"
+      end
+
+      it "adds a challenge code error" do
+        challenge.validate
+
+        expect(challenge.errors.of_kind?(:challenge_code, :taken)).to be(true)
+      end
+    end
+
+    context "with a lowercase challenge code" do
+      before { challenge.challenge_code = "abc123" }
+
+      it "adds a challenge code error" do
+        challenge.validate
+
+        expect(challenge.errors.of_kind?(:challenge_code, :invalid)).to be(true)
+      end
+    end
+
+    context "with a short challenge code" do
+      before { challenge.challenge_code = "ABC12" }
+
+      it "adds a challenge code error" do
+        challenge.validate
+
+        expect(challenge.errors.of_kind?(:challenge_code, :invalid)).to be(true)
       end
     end
 
@@ -86,7 +129,7 @@ RSpec.describe Challenge, type: :model do
       it "adds a status error" do
         challenge.validate
 
-        expect(challenge.errors[:status]).to include("is not included in the list")
+        expect(challenge.errors.of_kind?(:status, :inclusion)).to be(true)
       end
     end
 
@@ -103,6 +146,27 @@ RSpec.describe Challenge, type: :model do
         challenge.validate
 
         expect(challenge.errors[:end_date]).to include("must be greater than or equal to start date")
+      end
+    end
+  end
+
+  describe ".generate_unique_challenge_code" do
+    before do
+      create(:challenge, challenge_code: "ABC123")
+      allow(SecureRandom).to receive(:alphanumeric).and_return("ABC123", "XYZ789")
+    end
+
+    it "retries until the generated code is unique" do
+      expect(described_class.generate_unique_challenge_code).to eq("XYZ789")
+    end
+  end
+
+  describe "#challenge_code" do
+    context "when the challenge is persisted" do
+      let(:challenge) { create(:challenge, challenge_code: "ABC123") }
+
+      it "cannot be assigned" do
+        expect { challenge.challenge_code = "XYZ789" }.to raise_error(ActiveRecord::ReadonlyAttributeError)
       end
     end
   end

@@ -3,6 +3,7 @@ module Admin
     PUBLISHED_STATUS = "published"
     ALREADY_PUBLISHED_ERROR = "Challenge is already published".freeze
     MISSING_TASKS_ERROR = "Challenge must have tasks before publishing".freeze
+    MISSING_CHALLENGE_CODE_ERROR = "Challenge must have a code before publishing".freeze
 
     input do
       attribute :challenge_id, :integer
@@ -19,6 +20,7 @@ module Admin
       return Failure(:challenge_not_found) unless challenge
 
       return Failure(:already_published, challenge:, errors: [ ALREADY_PUBLISHED_ERROR ]) if published?(challenge)
+      return Failure(:missing_challenge_code, challenge:, errors: [ MISSING_CHALLENGE_CODE_ERROR ]) if challenge.challenge_code.blank?
       return Failure(:missing_tasks, challenge:, errors: [ MISSING_TASKS_ERROR ]) unless challenge.challenge_tasks.exists?
 
       if challenge.update(status: PUBLISHED_STATUS)

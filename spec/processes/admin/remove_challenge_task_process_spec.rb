@@ -58,7 +58,7 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:challenge_task_id]).to include("can't be blank")
+        expect(result[:input].errors.of_kind?(:challenge_task_id, :blank)).to be(true)
       end
 
       it "does not remove the task" do

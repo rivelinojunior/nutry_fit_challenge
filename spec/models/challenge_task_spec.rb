@@ -14,7 +14,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a challenge error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:challenge]).to include("must exist")
+        expect(challenge_task.errors.of_kind?(:challenge, :blank)).to be(true)
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a name error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:name]).to include("can't be blank")
+        expect(challenge_task.errors.of_kind?(:name, :blank)).to be(true)
       end
     end
 
@@ -34,7 +34,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a points error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:points]).to include("can't be blank")
+        expect(challenge_task.errors.of_kind?(:points, :blank)).to be(true)
       end
     end
 
@@ -44,7 +44,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a points error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:points]).to include("must be greater than 0")
+        expect(challenge_task.errors.of_kind?(:points, :greater_than)).to be(true)
       end
     end
 
@@ -54,7 +54,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a points error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:points]).to include("must be an integer")
+        expect(challenge_task.errors.of_kind?(:points, :not_an_integer)).to be(true)
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe ChallengeTask, type: :model do
       it "adds a scheduled date error" do
         challenge_task.validate
 
-        expect(challenge_task.errors[:scheduled_on]).to include("can't be blank")
+        expect(challenge_task.errors.of_kind?(:scheduled_on, :blank)).to be(true)
       end
     end
 

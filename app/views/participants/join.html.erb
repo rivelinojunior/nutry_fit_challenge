@@ -1,0 +1,31 @@
+<% content_for :title, "Join a Challenge" %>
+
+<section class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col justify-center px-4 py-8">
+  <div class="mb-6 text-center">
+    <p class="text-sm font-semibold text-primary">Nutry.fit</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content sm:text-3xl">Join a Challenge</h1>
+    <p class="mt-2 text-sm leading-6 text-base-content/70">Ask the organizer for the challenge code</p>
+  </div>
+
+  <div class="nutry-card p-5 sm:p-6">
+    <%= form_with url: join_path, class: "space-y-5" do |form| %>
+      <div>
+        <%= form.label :challenge_code, "Challenge Code", class: "label pb-2 text-sm font-medium" %>
+        <%= form.text_field :challenge_code,
+          value: @challenge_code,
+          autofocus: true,
+          autocomplete: "off",
+          required: true,
+          placeholder: "ABC123",
+          class: "input input-bordered w-full uppercase tracking-normal #{'input-error' if @error_message.present?}",
+          oninput: "this.value = this.value.trim().toUpperCase()" %>
+
+        <% if @error_message.present? %>
+          <p class="mt-2 text-sm text-error"><%= @error_message %></p>
+        <% end %>
+      </div>
+
+      <%= form.submit "Join Challenge", class: "btn nutry-cta-gradient w-full rounded-full" %>
+    <% end %>
+  </div>
+</section>
