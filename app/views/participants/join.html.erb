@@ -1,16 +1,22 @@
-<% content_for :title, "Join a Challenge" %>
+<% content_for :title, "Entrar em um desafio" %>
 
-<section class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col justify-center px-4 py-8">
+<section class="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-md flex-col justify-center px-4 py-3 sm:min-h-[calc(100vh-4rem)] sm:py-8">
+  <div class="pointer-events-none fixed left-6 top-6 flex w-7 flex-col items-start gap-1 sm:left-12 sm:top-20" aria-hidden="true">
+    <span class="h-0.5 w-[20px] rounded-full bg-base-content"></span>
+    <span class="h-0.5 w-[14px] rounded-full bg-base-content"></span>
+  </div>
+
+  <%= render "devise/shared/brand" %>
+
   <div class="mb-6 text-center">
-    <p class="text-sm font-semibold text-primary">Nutry.fit</p>
-    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content sm:text-3xl">Join a Challenge</h1>
-    <p class="mt-2 text-sm leading-6 text-base-content/70">Ask the organizer for the challenge code</p>
+    <h1 class="mt-2 text-xl font-bold tracking-normal text-base-content sm:text-2xl">Entrar em um desafio</h1>
+    <p class="mt-2 text-sm leading-6 text-base-content/70">Peça o código do desafio para o organizador</p>
   </div>
 
   <div class="nutry-card p-5 sm:p-6">
     <%= form_with url: join_path, class: "space-y-5" do |form| %>
       <div>
-        <%= form.label :challenge_code, "Challenge Code", class: "label pb-2 text-sm font-medium" %>
+        <%= form.label :challenge_code, "Código do desafio", class: "label pb-2 text-sm font-medium" %>
         <%= form.text_field :challenge_code,
           value: @challenge_code,
           autofocus: true,
@@ -25,7 +31,7 @@
         <% end %>
       </div>
 
-      <%= form.submit "Join Challenge", class: "btn nutry-cta-gradient w-full rounded-full" %>
+      <%= form.submit "Entrar no desafio", class: "btn nutry-cta-gradient w-full rounded-full" %>
     <% end %>
   </div>
 </section>

@@ -17,13 +17,13 @@ RSpec.describe "Participants" do
     it "renders the join title" do
       get join_path
 
-      expect(response.body).to include("Join a Challenge")
+      expect(response.body).to include("Entrar em um desafio")
     end
 
     it "renders the challenge code field" do
       get join_path
 
-      expect(response.body).to include("Challenge Code")
+      expect(response.body).to include("Código do desafio")
     end
   end
 
@@ -31,7 +31,7 @@ RSpec.describe "Participants" do
     it "renders the join screen" do
       get root_path
 
-      expect(response.body).to include("Join a Challenge")
+      expect(response.body).to include("Entrar em um desafio")
     end
   end
 
@@ -60,7 +60,7 @@ RSpec.describe "Participants" do
       it "renders a clear inline error" do
         post join_path, params: { challenge_code: "NOPE12" }
 
-        expect(response.body).to include("Challenge not found")
+        expect(response.body).to include("Desafio não encontrado")
       end
 
       it "returns unprocessable entity" do
@@ -76,7 +76,7 @@ RSpec.describe "Participants" do
       it "renders a clear inline error" do
         post join_path, params: { challenge_code: challenge.challenge_code }
 
-        expect(response.body).to include("Challenge not available")
+        expect(response.body).to include("Desafio indisponível")
       end
     end
 
@@ -92,7 +92,7 @@ RSpec.describe "Participants" do
       it "renders a clear inline error" do
         post join_path, params: { challenge_code: challenge.challenge_code }
 
-        expect(response.body).to include("Challenge already started")
+        expect(response.body).to include("Desafio já começou")
       end
     end
 
