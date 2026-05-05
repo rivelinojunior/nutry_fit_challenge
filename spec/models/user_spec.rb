@@ -32,6 +32,16 @@ RSpec.describe User, type: :model do
     expect(user.valid_password?("password123")).to be(true)
   end
 
+  it "sends confirmation instructions when created unconfirmed" do
+    ActionMailer::Base.deliveries.clear
+
+    create(:user, confirmed_at: nil)
+
+    expect(ActionMailer::Base.deliveries.map(&:subject)).to include(
+      I18n.t("devise.mailer.confirmation_instructions.subject")
+    )
+  end
+
   it "has many challenges with dependent destroy" do
     association = described_class.reflect_on_association(:challenges)
 
