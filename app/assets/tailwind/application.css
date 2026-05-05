@@ -99,6 +99,22 @@
   .nutry-cta-gradient:hover {
     filter: brightness(1.02);
   }
+
+  .nutry-password-input > .field_with_errors {
+    display: inline-flex;
+    min-width: 0;
+    height: 100%;
+    flex-grow: 1;
+    align-items: center;
+  }
+
+  .nutry-password-input > .field_with_errors > input {
+    min-width: 0;
+    height: 100%;
+    flex-grow: 1;
+    background-color: transparent;
+    outline: none;
+  }
 }
 
 @layer utilities {
