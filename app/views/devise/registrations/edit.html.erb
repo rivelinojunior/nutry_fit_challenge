@@ -1,0 +1,75 @@
+<% content_for :title, "Minha conta | Nutry.fit Challenge" %>
+
+<section class="mx-auto w-full max-w-2xl py-8">
+  <%= render "devise/shared/brand" %>
+
+  <div class="nutry-card p-6 sm:p-8">
+    <div class="mb-6">
+      <p class="text-sm font-semibold text-primary">Perfil</p>
+      <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content">Minha conta</h1>
+      <p class="mt-2 text-sm leading-6 text-base-content/70">Atualize seus dados de acesso ao desafio.</p>
+    </div>
+
+    <%= render "devise/shared/flash" %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-5" }) do |f| %>
+      <div>
+        <%= f.label :name, "Nome", class: "label pb-2 text-sm font-medium" %>
+        <%= f.text_field :name, autofocus: true, autocomplete: "name", placeholder: "Seu nome", class: "input input-bordered w-full #{'input-error' if resource.errors[:name].any?}" %>
+      </div>
+
+      <div>
+        <%= f.label :email, "E-mail", class: "label pb-2 text-sm font-medium" %>
+        <%= f.email_field :email, autocomplete: "email", placeholder: "voce@email.com", class: "input input-bordered w-full #{'input-error' if resource.errors[:email].any?}" %>
+      </div>
+
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <div class="alert alert-warning text-sm">
+          <span>Aguardando confirmação para <%= resource.unconfirmed_email %>.</span>
+        </div>
+      <% end %>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <%= render "devise/shared/password_field",
+          form: f,
+          resource: resource,
+          attribute: :password,
+          label_text: "Nova senha",
+          autocomplete: "new-password",
+          hint: "Deixe em branco para manter a senha atual." %>
+
+        <%= render "devise/shared/password_field",
+          form: f,
+          resource: resource,
+          attribute: :password_confirmation,
+          label_text: "Confirmar nova senha",
+          autocomplete: "new-password" %>
+      </div>
+
+      <%= render "devise/shared/password_field",
+        form: f,
+        resource: resource,
+        attribute: :current_password,
+        label_text: "Senha atual",
+        autocomplete: "current-password",
+        hint: "Necessária para confirmar as alterações." %>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <%= f.submit "Salvar alterações", class: "btn btn-primary rounded-full sm:min-w-48" %>
+        <%= link_to "Voltar", request.referer.presence || "/", class: "btn btn-ghost rounded-full" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6 nutry-card border-error/25 p-6 sm:p-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-base-content">Cancelar conta</h2>
+        <p class="mt-1 text-sm text-base-content/70">Essa ação remove seu acesso e não deve ser usada para sair de um desafio.</p>
+      </div>
+
+      <%= button_to "Cancelar conta", registration_path(resource_name), method: :delete, data: { turbo_confirm: "Tem certeza que deseja cancelar sua conta?" }, class: "btn btn-error btn-outline rounded-full" %>
+    </div>
+  </div>
+</section>

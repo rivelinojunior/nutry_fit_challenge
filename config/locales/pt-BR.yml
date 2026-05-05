@@ -1,2 +1,23 @@
 "pt-BR":
   hello: "Olá mundo"
+  activerecord:
+    models:
+      user: "usuário"
+    attributes:
+      user:
+        name: "Nome"
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirmação de senha"
+        current_password: "Senha atual"
+        remember_me: "Manter conectado"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "não pode ficar em branco"
+      confirmation: "não confere"
+      invalid: "não é válido"
+      taken: "já está em uso"
+      too_short:
+        one: "é muito curta (mínimo: 1 caractere)"
+        other: "é muito curta (mínimo: %{count} caracteres)"

@@ -100,3 +100,15 @@
     filter: brightness(1.02);
   }
 }
+
+@layer utilities {
+  .input:not(.input-error):focus,
+  .input:not(.input-error):focus-within,
+  .select:not(.select-error):focus,
+  .select:not(.select-error):focus-within,
+  .textarea:not(.textarea-error):focus,
+  .textarea:not(.textarea-error):focus-within {
+    --input-color: var(--color-primary);
+    outline: none;
+  }
+}
