@@ -57,8 +57,8 @@
       </p>
 
       <%= button_to "Publicar desafio",
-                    @challenge.present? ? admin_publish_challenge_tasks_path(@challenge) : "#",
-                    method: :post,
+                    @challenge.present? ? admin_publish_challenge_path(@challenge) : "#",
+                    method: :patch,
                     disabled: @challenge.blank? || @tasks_by_date.blank? || @challenge.status == "published",
                     data: { turbo_confirm: "Publicar este desafio com as tarefas atuais?" },
                     class: "btn btn-primary mt-4 w-full rounded-full" %>

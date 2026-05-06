@@ -1,6 +1,7 @@
 module Admin
   class ChallengeTasksController < BaseController
     before_action :set_challenge
+    before_action :set_challenge_task, only: :destroy
 
     def index
       prepare_view_state
@@ -20,9 +21,9 @@ module Admin
     end
 
     def destroy
-      return render_index_with_errors([ "Tarefa não encontrada." ]) unless task_belongs_to_challenge?
+      return render_index_with_errors([ "Tarefa não encontrada." ]) if @challenge_task.blank?
 
-      result = Admin::RemoveChallengeTaskProcess.call(challenge_task_id: params[:id])
+      result = Admin::RemoveChallengeTaskProcess.call(challenge_task_id: @challenge_task.id)
 
       case result
       in Solid::Success[type: :removed]
@@ -34,25 +35,14 @@ module Admin
       end
     end
 
-    def publish
-      result = Admin::PublishChallengeProcess.call(challenge_id: @challenge&.id)
-
-      case result
-      in Solid::Success[type: :published]
-        redirect_to admin_challenge_tasks_path(@challenge), notice: "Desafio publicado."
-      in Solid::Failure[type: :invalid_input]
-        render_index_with_errors(result[:input].errors.full_messages)
-      in Solid::Failure[type: :challenge_not_found]
-        render_index_with_errors([ "Desafio não encontrado." ])
-      in Solid::Failure[type: :already_published | :missing_challenge_code | :missing_tasks | :validation_failed]
-        render_index_with_errors(result[:errors])
-      end
-    end
-
     private
 
     def set_challenge
       @challenge = current_user.challenges.find_by(id: params[:challenge_id])
+    end
+
+    def set_challenge_task
+      @challenge_task = @challenge&.challenge_tasks&.find_by(id: params[:id])
     end
 
     def prepare_view_state(errors = [])
@@ -102,10 +92,6 @@ module Admin
       return [] if weekdays.blank?
 
       weekdays.reject(&:blank?).map(&:to_i)
-    end
-
-    def task_belongs_to_challenge?
-      @challenge.present? && @challenge.challenge_tasks.exists?(id: params[:id])
     end
   end
 end

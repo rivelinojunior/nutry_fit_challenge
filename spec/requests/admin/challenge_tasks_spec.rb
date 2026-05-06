@@ -262,67 +262,22 @@ RSpec.describe "Admin challenge tasks" do
         expect(response.body).to include("Tarefa não encontrada")
       end
     end
-  end
 
-  describe "POST /admin/challenge/:challenge_id/tasks/publish" do
-    context "when at least one task exists" do
+    context "when the task belongs to another challenge from the same user" do
       let!(:challenge) { create(:challenge, user:) }
+      let!(:other_challenge) { create(:challenge, user:) }
+      let!(:task) { create(:challenge_task, challenge: other_challenge) }
 
-      before do
-        create(:challenge_task, challenge:)
+      it "does not remove the task" do
+        expect do
+          delete admin_challenge_task_path(challenge, task)
+        end.not_to change(ChallengeTask, :count)
       end
 
-      it "redirects to the task list" do
-        post admin_publish_challenge_tasks_path(challenge)
+      it "shows not found" do
+        delete admin_challenge_task_path(challenge, task)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
-      end
-
-      it "publishes the challenge" do
-        post admin_publish_challenge_tasks_path(challenge)
-
-        expect(challenge.reload.status).to eq("published")
-      end
-    end
-
-    context "when no task exists" do
-      let!(:challenge) { create(:challenge, user:) }
-
-      it "returns unprocessable entity" do
-        post admin_publish_challenge_tasks_path(challenge)
-
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it "shows the process error" do
-        post admin_publish_challenge_tasks_path(challenge)
-
-        expect(response.body).to include("Challenge must have tasks before publishing")
-      end
-    end
-
-    context "when the challenge code is missing" do
-      let!(:challenge) { create(:challenge, user:) }
-
-      before do
-        allow(Admin::PublishChallengeProcess).to receive(:call).and_return(
-          Solid::Output::Failure.new(
-            type: :missing_challenge_code,
-            value: { errors: [ "Challenge must have a code before publishing" ] }
-          )
-        )
-      end
-
-      it "returns unprocessable entity" do
-        post admin_publish_challenge_tasks_path(challenge)
-
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it "shows the process error" do
-        post admin_publish_challenge_tasks_path(challenge)
-
-        expect(response.body).to include("Challenge must have a code before publishing")
+        expect(response.body).to include("Tarefa não encontrada")
       end
     end
   end

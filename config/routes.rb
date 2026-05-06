@@ -5,8 +5,8 @@ Rails.application.routes.draw do
     resource :challenge, only: %i[new create edit update]
     get "challenge/:challenge_id/tasks", to: "challenge_tasks#index", as: :challenge_tasks
     post "challenge/:challenge_id/tasks", to: "challenge_tasks#create", as: nil
-    post "challenge/:challenge_id/tasks/publish", to: "challenge_tasks#publish", as: :publish_challenge_tasks
     delete "challenge/:challenge_id/tasks/:id", to: "challenge_tasks#destroy", as: :challenge_task
+    match "publish_challenge/:id", to: "publish_challenges#update", as: :publish_challenge, via: %i[put patch]
   end
 
   get "join", to: "participants#join", as: :join
