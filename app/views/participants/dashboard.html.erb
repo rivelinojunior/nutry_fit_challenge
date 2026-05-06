@@ -1,10 +1,10 @@
 <% content_for :title, "#{@challenge.name} | Hoje" %>
 
 <% state_styles = {
-  "available" => { label: "Disponível", badge: "badge-success", text: "text-primary", panel: "border-base-300 bg-base-200" },
-  "checked" => { label: "Feita", badge: "badge-success", text: "text-primary", panel: "border-primary/30 bg-primary/5" },
-  "future" => { label: "Em breve", badge: "badge-warning", text: "text-warning", panel: "border-warning/30 bg-warning/10" },
-  "expired" => { label: "Expirada", badge: "badge-outline", text: "text-base-content/50", panel: "border-base-300 bg-[#ededed]" }
+  "available" => { label: "Disponível", badge: "badge-outline border-primary/30 bg-base-100 text-primary", text: "text-primary", panel: "border-base-300 bg-base-100" },
+  "checked" => { label: "Feita", badge: "badge-outline border-primary/30 bg-base-100 text-primary", text: "text-primary", panel: "border-base-300 bg-base-100" },
+  "future" => { label: "Em breve", badge: "badge-outline border-warning/30 bg-base-100 text-warning", text: "text-warning", panel: "border-base-300 bg-base-100" },
+  "expired" => { label: "Expirada", badge: "badge-outline bg-base-100 text-base-content/70", text: "text-base-content/50", panel: "border-base-300 bg-[#ededed]" }
 } %>
 <% task_sections = %w[available future checked expired] %>
 
@@ -78,16 +78,25 @@
                   <% style = state_styles.fetch(task_item.state) %>
 
                   <article class="nutry-card border <%= style[:panel] %> p-4">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex items-center justify-between gap-4">
                       <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
                           <h3 class="text-base font-semibold tracking-normal text-base-content"><%= task.name %></h3>
-                          <span class="badge <%= style[:badge] %>"><%= style[:label] %></span>
+                          <% if task.description.present? %>
+                            <details class="nutry-description-disclosure group relative inline-flex">
+                              <summary class="flex size-5 cursor-pointer select-none items-center justify-center rounded-full border border-base-300 bg-base-100 text-xs font-bold leading-none text-base-content/60 outline-none transition hover:border-primary/30 hover:text-primary focus-visible:border-primary focus-visible:text-primary">
+                                <span aria-hidden="true">i</span>
+                                <span class="sr-only">Ver descrição da tarefa</span>
+                              </summary>
+                              <div class="nutry-description-popover absolute left-0 top-full z-20 mt-2 w-64 max-w-[calc(100vw-3rem)] rounded-lg border border-base-300 bg-base-100 p-3 text-xs font-medium leading-5 text-base-content/70 shadow-sm">
+                                <%= task.description %>
+                              </div>
+                            </details>
+                          <% end %>
+                          <% unless task_item.state == "available" %>
+                            <span class="badge <%= style[:badge] %>"><%= style[:label] %></span>
+                          <% end %>
                         </div>
-
-                        <% if task.description.present? %>
-                          <p class="mt-2 text-sm leading-6 text-base-content/70"><%= task.description %></p>
-                        <% end %>
 
                         <div class="mt-3 flex flex-wrap gap-2 text-xs font-medium text-base-content/60">
                           <span><%= task.points %> pts</span>
@@ -101,7 +110,7 @@
 
                       <% if task_item.state == "available" %>
                         <div class="shrink-0">
-                          <%= button_to "Marcar tarefa",
+                          <%= button_to "Concluir",
                             participant_checkins_path(@participant),
                             params: { challenge_task_id: task.id },
                             class: "btn btn-primary rounded-full" %>

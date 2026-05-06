@@ -115,6 +115,24 @@
     background-color: transparent;
     outline: none;
   }
+
+  .nutry-description-disclosure > summary {
+    list-style: none;
+  }
+
+  .nutry-description-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nutry-description-popover {
+    display: none;
+  }
+
+  .nutry-description-disclosure:hover .nutry-description-popover,
+  .nutry-description-disclosure[open] .nutry-description-popover,
+  .nutry-description-disclosure:focus-within .nutry-description-popover {
+    display: block;
+  }
 }
 
 @layer utilities {
