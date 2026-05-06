@@ -13,8 +13,6 @@ Rails.application.routes.draw do
   get "participants/:id/waiting-room", to: "participants#waiting_room", as: :participant_waiting_room
   get "participants/:id/dashboard", to: "participants#dashboard", as: :participant_dashboard
 
-  resource :challenge_participant, only: %i[new create]
-
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
