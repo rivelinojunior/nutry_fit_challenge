@@ -29,41 +29,14 @@
     </div>
   </header>
 
-  <% if notice.present? %>
-    <div class="alert alert-success"><%= notice %></div>
-  <% end %>
-
-  <% if alert.present? %>
-    <div class="alert alert-error"><%= alert %></div>
-  <% end %>
-
-  <% if @errors.present? %>
-    <div class="alert alert-error">
-      <ul class="list-disc pl-5">
-        <% @errors.each do |error| %>
-          <li><%= error %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "admin/challenge_tasks/flash", message: notice, kind: :notice %>
+  <%= render "admin/challenge_tasks/flash", message: alert, kind: :alert %>
+  <%= render "admin/challenge_tasks/errors", errors: [] %>
 
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)]">
-    <%= render "form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
-
-    <aside class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
-      <h2 class="text-lg font-semibold">Publicação</h2>
-      <p class="mt-1 text-sm text-base-content/70">
-        Revise as tarefas materializadas antes de publicar o desafio.
-      </p>
-
-      <%= button_to "Publicar desafio",
-                    @challenge.present? ? admin_publish_challenge_path(@challenge) : "#",
-                    method: :patch,
-                    disabled: @challenge.blank? || @tasks_by_date.blank? || @challenge.status == "published",
-                    data: { turbo_confirm: "Publicar este desafio com as tarefas atuais?" },
-                    class: "btn btn-primary mt-4 w-full rounded-full" %>
-    </aside>
+    <%= render "admin/challenge_tasks/form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
+    <%= render "admin/challenge_tasks/publication", challenge: @challenge, tasks_by_date: @tasks_by_date %>
   </div>
 
-  <%= render "task_list", challenge: @challenge, tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
+  <%= render "admin/challenge_tasks/task_list", challenge: @challenge, tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
 </section>

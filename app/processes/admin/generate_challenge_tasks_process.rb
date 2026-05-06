@@ -9,6 +9,7 @@ module Admin
 
     input do
       attribute :challenge_id, :integer
+      attribute :user_id, :integer
       attribute :name, :string
       attribute :description, :string
       attribute :points, :integer
@@ -18,7 +19,7 @@ module Admin
       attribute :weekdays
       attribute :specific_date, :date
 
-      validates :challenge_id, :name, :points, :recurrence_type, presence: true
+      validates :challenge_id, :user_id, :name, :points, :recurrence_type, presence: true
       validates :points, numericality: { only_integer: true, greater_than: 0 }, allow_blank: true
       validates :recurrence_type, inclusion: { in: RECURRENCE_TYPES }, allow_blank: true
 
@@ -47,7 +48,7 @@ module Admin
     end
 
     def call(attributes)
-      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id])
+      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id], user_id: attributes[:user_id])
       return Failure(:challenge_not_found, errors: [ CHALLENGE_NOT_FOUND_ERROR ]) unless challenge
 
       return Failure(:already_started, challenge:, errors: [ ALREADY_STARTED_ERROR ]) if started?(challenge)
@@ -55,9 +56,9 @@ module Admin
 
       tasks = create_tasks!(challenge, attributes)
 
-      Success(:created, tasks:)
+      Success(:created, challenge:, tasks:)
     rescue ActiveRecord::RecordInvalid => e
-      Failure(:validation_failed, errors: e.record.errors.full_messages)
+      Failure(:validation_failed, challenge:, errors: e.record.errors.full_messages)
     end
 
     private

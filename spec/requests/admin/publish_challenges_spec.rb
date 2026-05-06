@@ -15,10 +15,10 @@ RSpec.describe "Admin publish challenges" do
         create(:challenge_task, challenge:)
       end
 
-      it "redirects to the task list" do
+      it "redirects to the challenge setup screen" do
         patch admin_publish_challenge_path(challenge)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
+        expect(response).to redirect_to(admin_challenge_path(challenge))
       end
 
       it "publishes the challenge" do
@@ -26,23 +26,15 @@ RSpec.describe "Admin publish challenges" do
 
         expect(challenge.reload.status).to eq("published")
       end
-
-      it "passes the route id to the publish process" do
-        allow(Admin::PublishChallengeProcess).to receive(:call).and_call_original
-
-        patch admin_publish_challenge_path(challenge)
-
-        expect(Admin::PublishChallengeProcess).to have_received(:call).with(challenge_id: challenge.to_param)
-      end
     end
 
     context "when no task exists" do
       let!(:challenge) { create(:challenge, user:) }
 
-      it "redirects to the task list" do
+      it "redirects to the challenge setup screen" do
         patch admin_publish_challenge_path(challenge)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
+        expect(response).to redirect_to(admin_challenge_path(challenge))
       end
 
       it "sets the process error as a flash alert" do
@@ -56,18 +48,14 @@ RSpec.describe "Admin publish challenges" do
       let!(:challenge) { create(:challenge, user:) }
 
       before do
-        allow(Admin::PublishChallengeProcess).to receive(:call).and_return(
-          Solid::Output::Failure.new(
-            type: :missing_challenge_code,
-            value: { errors: [ "Challenge must have a code before publishing" ] }
-          )
-        )
+        create(:challenge_task, challenge:)
+        Challenge.where(id: challenge.id).update_all(challenge_code: "")
       end
 
-      it "redirects to the task list" do
+      it "redirects to the challenge setup screen" do
         patch admin_publish_challenge_path(challenge)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path(challenge))
+        expect(response).to redirect_to(admin_challenge_path(challenge))
       end
 
       it "sets the process error as a flash alert" do
@@ -77,11 +65,52 @@ RSpec.describe "Admin publish challenges" do
       end
     end
 
+    context "when the challenge is already published" do
+      let!(:challenge) { create(:challenge, user:, status: "published") }
+
+      before do
+        create(:challenge_task, challenge:)
+      end
+
+      it "redirects to the challenge setup screen" do
+        patch admin_publish_challenge_path(challenge)
+
+        expect(response).to redirect_to(admin_challenge_path(challenge))
+      end
+
+      it "sets the process error as a flash alert" do
+        patch admin_publish_challenge_path(challenge)
+
+        expect(flash[:alert]).to eq("Challenge is already published")
+      end
+    end
+
+    context "when publishing fails validation" do
+      let!(:challenge) { create(:challenge, user:) }
+
+      before do
+        create(:challenge_task, challenge:)
+        Challenge.where(id: challenge.id).update_all(challenge_code: "bad-code")
+      end
+
+      it "redirects to the challenge setup screen" do
+        patch admin_publish_challenge_path(challenge)
+
+        expect(response).to redirect_to(admin_challenge_path(challenge))
+      end
+
+      it "sets the validation error as a flash alert" do
+        patch admin_publish_challenge_path(challenge)
+
+        expect(flash[:alert]).to eq("Challenge code não é válido")
+      end
+    end
+
     context "when the challenge does not exist" do
-      it "redirects to the task list for the requested id" do
+      it "redirects to the challenge setup screen" do
         patch admin_publish_challenge_path(0)
 
-        expect(response).to redirect_to(admin_challenge_tasks_path(0))
+        expect(response).to redirect_to(admin_challenge_path(0))
       end
 
       it "sets a not found flash alert" do

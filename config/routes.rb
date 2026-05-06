@@ -2,10 +2,9 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :admin do
-    resource :challenge, only: %i[new create edit update]
-    get "challenge/:challenge_id/tasks", to: "challenge_tasks#index", as: :challenge_tasks
-    post "challenge/:challenge_id/tasks", to: "challenge_tasks#create", as: nil
-    delete "challenge/:challenge_id/tasks/:id", to: "challenge_tasks#destroy", as: :challenge_task
+    resources :challenges, only: %i[show new create edit update]
+    post "challenges/:challenge_id/tasks", to: "challenge_tasks#create", as: :challenge_tasks
+    delete "challenges/:challenge_id/tasks/:id", to: "challenge_tasks#destroy", as: :challenge_task
     match "publish_challenge/:id", to: "publish_challenges#update", as: :publish_challenge, via: %i[put patch]
   end
 

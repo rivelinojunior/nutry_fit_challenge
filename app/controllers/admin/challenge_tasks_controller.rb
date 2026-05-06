@@ -1,61 +1,44 @@
 module Admin
   class ChallengeTasksController < BaseController
-    before_action :set_challenge
-    before_action :set_challenge_task, only: :destroy
-
-    def index
-      prepare_view_state
-    end
-
     def create
-      result = Admin::GenerateChallengeTasksProcess.call(challenge_id: @challenge&.id, **challenge_task_params)
+      result = Admin::GenerateChallengeTasksProcess.call(challenge_id: params[:challenge_id], user_id: current_user.id, **challenge_task_params)
 
       case result
       in Solid::Success[type: :created]
-        redirect_to admin_challenge_tasks_path(@challenge), notice: "Tarefas geradas com sucesso."
+        render_success("Tarefas geradas com sucesso.", result[:challenge])
       in Solid::Failure[type: :invalid_input]
-        render_index_with_errors(result[:input].errors.full_messages)
+        render_failure(result[:input].errors.full_messages, result[:challenge])
       in Solid::Failure[type: :challenge_not_found | :already_started | :specific_date_out_of_range | :validation_failed]
-        render_index_with_errors(result[:errors])
+        render_failure(result[:errors], result[:challenge])
       end
     end
 
     def destroy
-      return render_index_with_errors([ "Tarefa não encontrada." ]) if @challenge_task.blank?
-
-      result = Admin::RemoveChallengeTaskProcess.call(challenge_task_id: @challenge_task.id)
+      result = Admin::RemoveChallengeTaskProcess.call(challenge_id: params[:challenge_id], challenge_task_id: params[:id], user_id: current_user.id)
 
       case result
       in Solid::Success[type: :removed]
-        redirect_to admin_challenge_tasks_path(@challenge), notice: "Tarefa removida."
+        render_success("Tarefa removida.", result[:challenge])
       in Solid::Failure[type: :invalid_input]
-        render_index_with_errors(result[:input].errors.full_messages)
+        render_failure(result[:input].errors.full_messages, result[:challenge])
       in Solid::Failure[type: :challenge_task_not_found | :already_started]
-        render_index_with_errors(result[:errors])
+        render_failure(result[:errors], result[:challenge])
       end
     end
 
     private
 
-    def set_challenge
-      @challenge = current_user.challenges.find_by(id: params[:challenge_id])
-    end
-
-    def set_challenge_task
-      @challenge_task = @challenge&.challenge_tasks&.find_by(id: params[:id])
-    end
-
-    def prepare_view_state(errors = [])
-      @errors = errors
-      @task_form = default_task_form.merge(submitted_task_form)
+    def prepare_view_state(challenge:, task_form: default_task_form)
+      @challenge = challenge
+      @task_form = task_form
       @challenge_started = @challenge.present? && @challenge.start_date <= Date.current
       @tasks_by_date = @challenge ? @challenge.challenge_tasks.order(:scheduled_on, :created_at).group_by(&:scheduled_on) : {}
     end
 
     def submitted_task_form
-      return {} unless params[:challenge_task].respond_to?(:permit!)
+      return default_task_form unless params.key?(:challenge_task)
 
-      params[:challenge_task].permit!.to_h
+      default_task_form.merge(params[:challenge_task].permit!.to_h)
     end
 
     def default_task_form
@@ -66,9 +49,31 @@ module Admin
       }
     end
 
-    def render_index_with_errors(errors)
-      prepare_view_state(errors)
-      render :index, status: :unprocessable_entity
+    def render_success(message, challenge)
+      prepare_view_state(challenge:)
+      respond_to do |format|
+        format.turbo_stream { render_task_stream(message:) }
+        format.html { redirect_to admin_challenge_path(challenge), notice: message }
+      end
+    end
+
+    def render_failure(errors, challenge)
+      prepare_view_state(challenge:, task_form: submitted_task_form)
+      respond_to do |format|
+        format.turbo_stream { render_task_stream(errors:, status: :unprocessable_entity) }
+        format.html { redirect_to admin_challenge_path(params[:challenge_id]), alert: errors.to_sentence }
+      end
+    end
+
+    def render_task_stream(message: nil, errors: [], status: :ok)
+      render :update, status:, locals: {
+        challenge: @challenge,
+        task_form: @task_form,
+        challenge_started: @challenge_started,
+        tasks_by_date: @tasks_by_date,
+        message:,
+        errors:
+      }
     end
 
     def challenge_task_params

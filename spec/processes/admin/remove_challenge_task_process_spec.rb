@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Admin::RemoveChallengeTaskProcess do
   describe ".call" do
-    subject(:result) { described_class.call(challenge_task_id:) }
+    subject(:result) { described_class.call(challenge_id:, challenge_task_id:, user_id:) }
 
     let(:challenge) do
       create(
@@ -12,7 +12,9 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
       )
     end
     let!(:challenge_task) { create(:challenge_task, challenge:) }
+    let(:challenge_id) { challenge.id }
     let(:challenge_task_id) { challenge_task.id }
+    let(:user_id) { challenge.user_id }
 
     context "when the challenge has not started" do
       it "returns a removed success" do
@@ -21,6 +23,10 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
 
       it "returns the removed task" do
         expect(result[:challenge_task]).to eq(challenge_task)
+      end
+
+      it "returns the challenge" do
+        expect(result[:challenge]).to eq(challenge)
       end
 
       it "removes the task" do
@@ -66,6 +72,38 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
       end
     end
 
+    context "without a challenge id" do
+      let(:challenge_id) { nil }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors.of_kind?(:challenge_id, :blank)).to be(true)
+      end
+
+      it "does not remove the task" do
+        expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
+    context "without a user id" do
+      let(:user_id) { nil }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors.of_kind?(:user_id, :blank)).to be(true)
+      end
+
+      it "does not remove the task" do
+        expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
     context "when the challenge task does not exist" do
       let(:challenge_task_id) { 0 }
 
@@ -74,10 +112,36 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:errors]).to contain_exactly("Challenge task not found")
+        expect(result[:errors]).to contain_exactly("Tarefa não encontrada.")
       end
 
       it "does not remove a task" do
+        expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
+    context "when the challenge task belongs to another challenge" do
+      let(:other_challenge) { create(:challenge) }
+      let!(:other_challenge_task) { create(:challenge_task, challenge: other_challenge) }
+      let(:challenge_task_id) { other_challenge_task.id }
+
+      it "returns a challenge task not found failure" do
+        expect(result).to be_failure(:challenge_task_not_found)
+      end
+
+      it "does not remove a task" do
+        expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
+    context "when the challenge belongs to another user" do
+      let(:user_id) { create(:user).id }
+
+      it "returns a challenge task not found failure" do
+        expect(result).to be_failure(:challenge_task_not_found)
+      end
+
+      it "does not remove the task" do
         expect { result }.not_to change(ChallengeTask, :count)
       end
     end

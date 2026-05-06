@@ -18,6 +18,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
     end
     let(:end_date) { start_date + 6.days }
     let(:challenge_id) { challenge.id }
+    let(:user_id) { challenge.user_id }
     let(:name) { "Beber água" }
     let(:description) { "Registrar consumo diário" }
     let(:points) { 10 }
@@ -29,6 +30,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
     let(:attributes) do
       {
         challenge_id:,
+        user_id:,
         name:,
         description:,
         points:,
@@ -51,6 +53,10 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
 
       it "returns the created tasks" do
         expect(result[:tasks].size).to eq(7)
+      end
+
+      it "returns the challenge" do
+        expect(result[:challenge]).to eq(challenge)
       end
 
       it "creates tasks for the whole challenge period" do
@@ -170,6 +176,18 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
     end
 
+    context "when the challenge belongs to another user" do
+      let(:user_id) { create(:user).id }
+
+      it "returns a challenge not found failure" do
+        expect(result).to be_failure(:challenge_not_found)
+      end
+
+      it "does not create tasks" do
+        expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
     context "when the challenge already started" do
       let(:challenge) do
         create(
@@ -201,6 +219,18 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
 
       it "returns a clear error" do
         expect(result[:input].errors.of_kind?(:challenge_id, :blank)).to be(true)
+      end
+    end
+
+    context "without a user id" do
+      let(:user_id) { nil }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors.of_kind?(:user_id, :blank)).to be(true)
       end
     end
 

@@ -1,0 +1,23 @@
+<%= turbo_stream.replace "challenge_task_notice" do %>
+  <%= render "admin/challenge_tasks/flash", message: message, kind: :notice %>
+<% end %>
+
+<%= turbo_stream.replace "challenge_task_alert" do %>
+  <%= render "admin/challenge_tasks/flash", message: nil, kind: :alert %>
+<% end %>
+
+<%= turbo_stream.replace "challenge_task_errors" do %>
+  <%= render "admin/challenge_tasks/errors", errors: errors %>
+<% end %>
+
+<%= turbo_stream.replace "challenge_task_form" do %>
+  <%= render "admin/challenge_tasks/form", challenge:, task_form:, challenge_started: %>
+<% end %>
+
+<%= turbo_stream.replace "challenge_publication" do %>
+  <%= render "admin/challenge_tasks/publication", challenge:, tasks_by_date: %>
+<% end %>
+
+<%= turbo_stream.replace "challenge_task_list" do %>
+  <%= render "admin/challenge_tasks/task_list", challenge:, tasks_by_date:, challenge_started: %>
+<% end %>

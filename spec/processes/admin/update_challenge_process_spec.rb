@@ -8,11 +8,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
     let(:attributes) do
       {
         challenge_id: challenge.id,
+        user_id: challenge.user_id,
         name: "Desafio Atualizado",
         description: "Checklist atualizado",
         start_date: Date.current + 2.days,
-        end_date: Date.current + 10.days,
-        timezone: "America/Sao_Paulo"
+        end_date: Date.current + 10.days
       }
     end
 
@@ -22,8 +22,7 @@ RSpec.describe Admin::UpdateChallengeProcess do
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: attributes[:start_date],
-          end_date: attributes[:end_date],
-          timezone: "America/Sao_Paulo"
+          end_date: attributes[:end_date]
         )
       end
 
@@ -34,8 +33,7 @@ RSpec.describe Admin::UpdateChallengeProcess do
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: attributes[:start_date],
-          end_date: attributes[:end_date],
-          timezone: "America/Sao_Paulo"
+          end_date: attributes[:end_date]
         )
       end
 
@@ -72,11 +70,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: challenge.id,
+          user_id: challenge.user_id,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: Date.current + 1.day,
-          timezone: "America/Sao_Paulo"
+          end_date: Date.current + 1.day
         }
       end
 
@@ -97,11 +95,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: nil,
+          user_id: challenge.user_id,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: Date.current + 10.days,
-          timezone: "America/Sao_Paulo"
+          end_date: Date.current + 10.days
         }
       end
 
@@ -114,11 +112,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: 0,
+          user_id: challenge.user_id,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: Date.current + 10.days,
-          timezone: "America/Sao_Paulo"
+          end_date: Date.current + 10.days
         }
       end
 
@@ -131,11 +129,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: challenge.id,
+          user_id: challenge.user_id,
           name: nil,
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: Date.current + 10.days,
-          timezone: "America/Sao_Paulo"
+          end_date: Date.current + 10.days
         }
       end
 
@@ -148,11 +146,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: challenge.id,
+          user_id: challenge.user_id,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: nil,
-          end_date: Date.current + 10.days,
-          timezone: "America/Sao_Paulo"
+          end_date: Date.current + 10.days
         }
       end
 
@@ -165,11 +163,11 @@ RSpec.describe Admin::UpdateChallengeProcess do
       let(:attributes) do
         {
           challenge_id: challenge.id,
+          user_id: challenge.user_id,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: nil,
-          timezone: "America/Sao_Paulo"
+          end_date: nil
         }
       end
 
@@ -178,20 +176,37 @@ RSpec.describe Admin::UpdateChallengeProcess do
       end
     end
 
-    context "with a blank timezone" do
+    context "without a user id" do
       let(:attributes) do
         {
           challenge_id: challenge.id,
+          user_id: nil,
           name: "Desafio Atualizado",
           description: "Checklist atualizado",
           start_date: Date.current + 2.days,
-          end_date: Date.current + 10.days,
-          timezone: nil
+          end_date: Date.current + 10.days
         }
       end
 
       it "returns an invalid input failure" do
         expect(result).to be_failure(:invalid_input)
+      end
+    end
+
+    context "when the challenge belongs to another user" do
+      let(:attributes) do
+        {
+          challenge_id: challenge.id,
+          user_id: create(:user).id,
+          name: "Desafio Atualizado",
+          description: "Checklist atualizado",
+          start_date: Date.current + 2.days,
+          end_date: Date.current + 10.days
+        }
+      end
+
+      it "returns a challenge not found failure" do
+        expect(result).to be_failure(:challenge_not_found)
       end
     end
   end

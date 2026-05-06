@@ -1,0 +1,11 @@
+<div id="challenge_task_errors">
+  <% if errors.present? %>
+    <div class="alert alert-error">
+      <ul class="list-disc pl-5">
+        <% errors.each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

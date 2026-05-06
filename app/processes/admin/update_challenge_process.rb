@@ -4,13 +4,13 @@ module Admin
 
     input do
       attribute :challenge_id, :integer
+      attribute :user_id, :integer
       attribute :name, :string
       attribute :description, :string
       attribute :start_date, :date
       attribute :end_date, :date
-      attribute :timezone, :string
 
-      validates :challenge_id, :name, :start_date, :end_date, :timezone, presence: true
+      validates :challenge_id, :user_id, :name, :start_date, :end_date, presence: true
     end
 
     deps do
@@ -18,7 +18,7 @@ module Admin
     end
 
     def call(attributes)
-      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id])
+      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id], user_id: attributes[:user_id])
       return Failure(:challenge_not_found) unless challenge
 
       return Failure(:already_started, challenge:, errors: [ ALREADY_STARTED_ERROR ]) if started?(challenge)
@@ -37,7 +37,7 @@ module Admin
     end
 
     def challenge_attributes(attributes)
-      attributes.slice(:name, :description, :start_date, :end_date, :timezone)
+      attributes.slice(:name, :description, :start_date, :end_date)
     end
   end
 end

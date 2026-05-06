@@ -40,7 +40,10 @@
       </div>
     <% end %>
 
-    <%= form_with model: challenge, url: admin_challenge_path, method: (challenge.persisted? ? :patch : :post), class: "space-y-5" do |form| %>
+    <%= form_with model: challenge,
+                  url: (challenge.persisted? ? admin_challenge_path(challenge) : admin_challenges_path),
+                  method: (challenge.persisted? ? :patch : :post),
+                  class: "space-y-5" do |form| %>
       <div>
         <%= form.label :name, "Nome", class: "label pb-2 text-sm font-medium" %>
         <%= form.text_field :name,
@@ -73,7 +76,7 @@
       </div>
 
       <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-        <%= link_to "Cancelar", edit_admin_challenge_path, class: "btn btn-ghost rounded-full" if challenge.persisted? %>
+        <%= link_to "Cancelar", edit_admin_challenge_path(challenge), class: "btn btn-ghost rounded-full" if challenge.persisted? %>
         <%= form.submit submit_label, class: "btn nutry-cta-gradient rounded-full sm:min-w-48" %>
       </div>
     <% end %>

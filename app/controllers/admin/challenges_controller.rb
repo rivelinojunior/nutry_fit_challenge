@@ -1,6 +1,12 @@
 module Admin
   class ChallengesController < BaseController
-    before_action :set_challenge, only: %i[edit update]
+    before_action :set_challenge, only: %i[show edit]
+
+    def show
+      @task_form = default_task_form
+      @challenge_started = @challenge.present? && @challenge.start_date <= Date.current
+      @tasks_by_date = @challenge ? @challenge.challenge_tasks.order(:scheduled_on, :created_at).group_by(&:scheduled_on) : {}
+    end
 
     def new
       @challenge = current_user.challenges.build
@@ -9,7 +15,7 @@ module Admin
     def create
       case Admin::CreateChallengeProcess.call(user: current_user, **challenge_params)
       in Solid::Success[type: :created, value: { challenge: }]
-        redirect_to admin_challenge_tasks_path(challenge), notice: "Desafio criado. Agora defina as tarefas."
+        redirect_to admin_challenge_path(challenge), notice: "Desafio criado. Agora defina as tarefas."
       in Solid::Failure[type: :validation_failed, value: { challenge: }]
         @challenge = challenge
         render :new, status: :unprocessable_entity
@@ -25,11 +31,9 @@ module Admin
     end
 
     def update
-      return redirect_to new_admin_challenge_path, alert: "Crie o desafio antes de editar." unless @challenge
-
-      case Admin::UpdateChallengeProcess.call(challenge_id: @challenge.id, **challenge_params, timezone: @challenge.timezone)
+      case Admin::UpdateChallengeProcess.call(challenge_id: params[:id], user_id: current_user.id, **challenge_params)
       in Solid::Success[type: :updated, value: { challenge: }]
-        redirect_to admin_challenge_tasks_path(challenge), notice: "Desafio atualizado."
+        redirect_to admin_challenge_path(challenge), notice: "Desafio atualizado."
       in Solid::Failure[type: :validation_failed, value: { challenge: }]
         @challenge = challenge
         render :edit, status: :unprocessable_entity
@@ -38,6 +42,9 @@ module Admin
         add_base_errors(@challenge, errors)
         render :edit, status: :unprocessable_entity
       in Solid::Failure[type: :invalid_input, value: { input: }]
+        @challenge = current_user.challenges.find_by(id: params[:id])
+        return redirect_to new_admin_challenge_path, alert: "Desafio não encontrado." unless @challenge
+
         @challenge.assign_attributes(challenge_params)
         copy_input_errors(input, @challenge)
         render :edit, status: :unprocessable_entity
@@ -49,7 +56,15 @@ module Admin
     private
 
     def set_challenge
-      @challenge = current_user.challenges.order(:id).first
+      @challenge = current_user.challenges.find_by(id: params[:id])
+    end
+
+    def default_task_form
+      {
+        "recurrence_type" => "daily",
+        "weekdays" => [],
+        "points" => 10
+      }
     end
 
     def challenge_params
