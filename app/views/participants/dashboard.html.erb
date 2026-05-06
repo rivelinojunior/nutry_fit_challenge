@@ -21,17 +21,38 @@
   </div>
 
   <div class="grid grid-cols-3 gap-2 sm:gap-3">
-    <div class="nutry-card p-3 sm:p-4">
+    <div class="nutry-card relative p-3 pr-10 sm:p-4 sm:pr-12">
+      <span class="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
+          <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
+          <path d="M18 9h1.5a1 1 0 0 0 0-2H18" />
+          <path d="M4 22h16" />
+          <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+          <path d="M6 9H4.5a1 1 0 0 1 0-2H6" />
+        </svg>
+      </span>
       <p class="text-xs font-medium text-base-content/60 sm:text-sm">Posição</p>
-      <p class="mt-2 text-xl font-bold text-primary sm:text-2xl"><%= @participant_rank ? "#{@participant_rank}º" : "-" %></p>
+      <p class="mt-2 text-xl font-bold text-base-content sm:text-2xl"><%= @participant_rank ? "#{@participant_rank}º" : "-" %></p>
     </div>
 
-    <div class="nutry-card p-3 sm:p-4">
-      <p class="text-sm font-medium text-base-content/60">Pontos</p>
+    <div class="nutry-card relative p-3 pr-10 sm:p-4 sm:pr-12">
+      <span class="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-yellow-100 text-yellow-500" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.12 2.12 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.14a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16z" />
+        </svg>
+      </span>
+      <p class="text-xs font-medium text-base-content/60 sm:text-sm">Pontos</p>
       <p class="mt-2 text-xl font-bold text-base-content sm:text-2xl"><%= @participant_ranking_item&.total_points || 0 %></p>
     </div>
 
-    <div class="nutry-card p-3 sm:p-4">
+    <div class="nutry-card relative p-3 pr-10 sm:p-4 sm:pr-12">
+      <span class="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-orange-100 text-orange-500" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c0-1.38.5-2 1-3 1.072-2.143.224-4.054-2-6 .5 2-2.5 4-2.5 6.5" />
+          <path d="M12 22c4.5-2 7-5.5 7-10a8 8 0 0 0-4-7c.5 2-1 3-2 4-1.5-3-4-4-4-7C5.5 4.5 4 8 4 12c0 4.5 3.5 8 8 10Z" />
+        </svg>
+      </span>
       <p class="text-xs font-medium text-base-content/60 sm:text-sm">Dias ativos</p>
       <p class="mt-2 text-xl font-bold text-base-content sm:text-2xl"><%= @participant_ranking_item&.active_days || 0 %></p>
     </div>
