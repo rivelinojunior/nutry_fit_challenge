@@ -25,6 +25,12 @@ RSpec.describe "Participants" do
 
       expect(response.body).to include("Código do desafio")
     end
+
+    it "renders the authenticated menu button" do
+      get join_path
+
+      expect(response.body).to include("Abrir menu")
+    end
   end
 
   describe "GET /" do
@@ -140,6 +146,12 @@ RSpec.describe "Participants" do
       get challenge_participant_waiting_room_path(challenge, participant)
 
       expect(response).to have_http_status(:ok)
+    end
+
+    it "renders the authenticated menu button" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response.body).to include("Abrir menu")
     end
 
     it "renders the challenge name" do
