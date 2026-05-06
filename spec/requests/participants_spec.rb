@@ -47,7 +47,7 @@ RSpec.describe "Participants" do
     it "redirects to the waiting room" do
       post join_path, params: { challenge_code: challenge.challenge_code }
 
-      expect(response).to redirect_to(participant_waiting_room_path(Participant.last))
+      expect(response).to redirect_to(challenge_participant_waiting_room_path(challenge, Participant.last))
     end
 
     it "looks up codes case insensitively" do
@@ -105,10 +105,10 @@ RSpec.describe "Participants" do
         end.not_to change(Participant, :count)
       end
 
-      it "redirects to the dashboard" do
+      it "redirects to the waiting room" do
         post join_path, params: { challenge_code: challenge.challenge_code }
 
-        expect(response).to redirect_to(participant_dashboard_path(participant))
+        expect(response).to redirect_to(challenge_participant_waiting_room_path(challenge, participant))
       end
     end
 
@@ -120,6 +120,69 @@ RSpec.describe "Participants" do
         post join_path, params: { challenge_code: challenge.challenge_code }
 
         expect(response).to redirect_to(participant_dashboard_path(participant))
+      end
+    end
+  end
+
+  describe "GET /challenges/:challenge_id/participants/:participant_id/waiting_room" do
+    let(:challenge) do
+      create(
+        :challenge,
+        name: "Desafio Maio",
+        description: "Complete tarefas em comunidade.",
+        status: "published",
+        start_date: Date.current + 3.days
+      )
+    end
+    let(:participant) { create(:participant, user:, challenge:) }
+
+    it "renders successfully" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "renders the challenge name" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response.body).to include("Desafio Maio")
+    end
+
+    it "renders the challenge description" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response.body).to include("Complete tarefas em comunidade.")
+    end
+
+    it "renders the days remaining message" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response.body).to include("Faltam 3 dias")
+    end
+
+    it "renders the waiting message" do
+      get challenge_participant_waiting_room_path(challenge, participant)
+
+      expect(response.body).to include("As tarefas serão liberadas quando a data de início chegar.")
+    end
+
+    context "when the challenge already started" do
+      let(:challenge) { create(:challenge, status: "published", start_date: Date.current) }
+
+      it "redirects to the dashboard" do
+        get challenge_participant_waiting_room_path(challenge, participant)
+
+        expect(response).to redirect_to(participant_dashboard_path(participant))
+      end
+    end
+
+    context "when the participant belongs to another user" do
+      let(:participant) { create(:participant, challenge:) }
+
+      it "returns not found" do
+        get challenge_participant_waiting_room_path(challenge, participant)
+
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

@@ -1,0 +1,32 @@
+<% content_for :title, "#{@challenge.name} | Sala de espera" %>
+
+<section class="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-3xl flex-col justify-center px-4 py-6 sm:min-h-[calc(100vh-4rem)] sm:py-10">
+  <div class="mb-6">
+    <p class="text-sm font-semibold text-primary">Sala de espera</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content sm:text-3xl"><%= @challenge.name %></h1>
+    <% if @challenge.description.present? %>
+      <p class="mt-3 max-w-2xl text-sm leading-6 text-base-content/70 sm:text-base"><%= @challenge.description %></p>
+    <% end %>
+  </div>
+
+  <div class="nutry-card p-5 sm:p-6">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-medium text-base-content/60">Início do desafio</p>
+        <p class="mt-1 text-lg font-semibold text-base-content"><%= @challenge.start_date.strftime("%d/%m/%Y") %></p>
+      </div>
+
+      <div class="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-left sm:min-w-40 sm:text-center">
+        <p class="text-lg font-bold leading-tight text-primary">
+          <%= @days_remaining == 1 ? "Falta 1 dia" : "Faltam #{@days_remaining} dias" %>
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-lg border border-base-300 bg-base-200 p-4">
+      <p class="text-sm leading-6 text-base-content/75">
+        Você já está no desafio. As tarefas serão liberadas quando a data de início chegar.
+      </p>
+    </div>
+  </div>
+</section>

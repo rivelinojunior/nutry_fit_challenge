@@ -10,7 +10,9 @@ Rails.application.routes.draw do
 
   get "join", to: "participants#join", as: :join
   post "join", to: "participants#create"
-  get "participants/:id/waiting-room", to: "participants#waiting_room", as: :participant_waiting_room
+  get "challenges/:challenge_id/participants/:participant_id/waiting_room",
+      to: "waiting_room#new",
+      as: :challenge_participant_waiting_room
   get "participants/:id/dashboard", to: "participants#dashboard", as: :participant_dashboard
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
