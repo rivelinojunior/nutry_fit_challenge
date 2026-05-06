@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       to: "waiting_room#new",
       as: :challenge_participant_waiting_room
   get "participants/:id/dashboard", to: "participants#dashboard", as: :participant_dashboard
+  post "participants/:participant_id/checkins", to: "checkins#create", as: :participant_checkins
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

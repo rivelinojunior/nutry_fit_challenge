@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Participants" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:user) { create(:user) }
 
   before do
@@ -193,6 +195,224 @@ RSpec.describe "Participants" do
 
       it "returns not found" do
         get challenge_participant_waiting_room_path(challenge, participant)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "GET /participants/:id/dashboard" do
+    let(:current_time) { Time.zone.local(2026, 5, 6, 12, 0, 0) }
+    let(:challenge) do
+      create(
+        :challenge,
+        name: "Desafio Maio",
+        status: "published",
+        start_date: Date.current,
+        end_date: Date.current + 6.days
+      )
+    end
+    let(:participant) { create(:participant, user:, challenge:) }
+    let!(:available_task) do
+      create(
+        :challenge_task,
+        challenge:,
+        name: "Registrar água",
+        points: 5,
+        scheduled_on: Date.current,
+        allowed_start_time: nil,
+        allowed_end_time: nil
+      )
+    end
+    let!(:checked_task) do
+      create(
+        :challenge_task,
+        challenge:,
+        name: "Caminhada",
+        points: 10,
+        scheduled_on: Date.current,
+        allowed_start_time: nil,
+        allowed_end_time: nil
+      )
+    end
+    let!(:future_task) do
+      create(
+        :challenge_task,
+        challenge:,
+        name: "Sono",
+        points: 8,
+        scheduled_on: Date.current,
+        allowed_start_time: Time.zone.parse("18:00"),
+        allowed_end_time: Time.zone.parse("23:00")
+      )
+    end
+    let!(:expired_task) do
+      create(
+        :challenge_task,
+        challenge:,
+        name: "Alongamento",
+        points: 4,
+        scheduled_on: Date.current,
+        allowed_start_time: Time.zone.parse("06:00"),
+        allowed_end_time: Time.zone.parse("08:00")
+      )
+    end
+
+    around do |example|
+      travel_to(current_time) { example.run }
+    end
+
+    before do
+      create(:checkin, participant:, challenge_task: checked_task, checked_at: current_time)
+    end
+
+    it "renders successfully" do
+      get participant_dashboard_path(participant)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "renders the challenge name" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Desafio Maio")
+    end
+
+    it "renders today's task names" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Registrar água", "Caminhada", "Sono", "Alongamento")
+    end
+
+    it "renders the available task action" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Marcar tarefa")
+    end
+
+    it "renders the checked task state" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Feita")
+    end
+
+    it "renders the future task state" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Em breve")
+    end
+
+    it "renders the expired task state" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("Expirada")
+    end
+
+    it "renders task groups in state order" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to match(/Registrar água.*Sono.*Caminhada.*Alongamento/m)
+    end
+
+    it "renders the participant total points" do
+      get participant_dashboard_path(participant)
+
+      expect(response.body).to include("10")
+    end
+
+    context "when the challenge has not started" do
+      let(:challenge) { create(:challenge, status: "published", start_date: Date.current + 1.day) }
+
+      it "redirects to the waiting room" do
+        get participant_dashboard_path(participant)
+
+        expect(response).to redirect_to(challenge_participant_waiting_room_path(challenge, participant))
+      end
+    end
+
+    context "when the participant belongs to another user" do
+      let(:participant) { create(:participant, challenge:) }
+
+      it "returns not found" do
+        get participant_dashboard_path(participant)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "POST /participants/:participant_id/checkins" do
+    let(:current_time) { Time.zone.local(2026, 5, 6, 12, 0, 0) }
+    let(:challenge) do
+      create(
+        :challenge,
+        status: "published",
+        start_date: Date.current,
+        end_date: Date.current + 6.days
+      )
+    end
+    let(:participant) { create(:participant, user:, challenge:) }
+    let(:challenge_task) do
+      create(
+        :challenge_task,
+        challenge:,
+        scheduled_on: Date.current,
+        allowed_start_time: nil,
+        allowed_end_time: nil
+      )
+    end
+
+    around do |example|
+      travel_to(current_time) { example.run }
+    end
+
+    it "creates a checkin" do
+      expect do
+        post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
+      end.to change(Checkin, :count).by(1)
+    end
+
+    it "redirects to the dashboard" do
+      post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
+
+      expect(response).to redirect_to(participant_dashboard_path(participant))
+    end
+
+    context "when the task is already checked" do
+      before do
+        create(:checkin, participant:, challenge_task:)
+      end
+
+      it "does not create another checkin" do
+        expect do
+          post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
+        end.not_to change(Checkin, :count)
+      end
+    end
+
+    context "when the task is outside the allowed window" do
+      let(:challenge_task) do
+        create(
+          :challenge_task,
+          challenge:,
+          scheduled_on: Date.current,
+          allowed_start_time: Time.zone.parse("18:00"),
+          allowed_end_time: Time.zone.parse("23:00")
+        )
+      end
+
+      it "does not create a checkin" do
+        expect do
+          post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
+        end.not_to change(Checkin, :count)
+      end
+    end
+
+    context "when the participant belongs to another user" do
+      let(:participant) { create(:participant, challenge:) }
+
+      it "returns not found" do
+        post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
 
         expect(response).to have_http_status(:not_found)
       end

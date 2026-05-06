@@ -1,0 +1,136 @@
+<% content_for :title, "#{@challenge.name} | Hoje" %>
+
+<% state_styles = {
+  "available" => { label: "Disponível", badge: "badge-success", text: "text-primary", panel: "border-base-300 bg-base-200" },
+  "checked" => { label: "Feita", badge: "badge-success", text: "text-primary", panel: "border-primary/30 bg-primary/5" },
+  "future" => { label: "Em breve", badge: "badge-warning", text: "text-warning", panel: "border-warning/30 bg-warning/10" },
+  "expired" => { label: "Expirada", badge: "badge-outline", text: "text-base-content/50", panel: "border-base-300 bg-[#ededed]" }
+} %>
+<% task_sections = %w[available future checked expired] %>
+
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-4 sm:py-8">
+  <% if notice.present? || alert.present? %>
+    <div class="alert <%= notice.present? ? "alert-success" : "alert-error" %>">
+      <span><%= notice.presence || alert %></span>
+    </div>
+  <% end %>
+
+  <div>
+    <h1 class="mt-1 text-2xl font-bold tracking-normal text-base-content sm:text-3xl"><%= @challenge.name %></h1>
+    <p class="mt-2 text-sm text-base-content/65"><%= Time.current.in_time_zone(@challenge.timezone).strftime("%d/%m/%Y") %></p>
+  </div>
+
+  <div class="grid grid-cols-3 gap-2 sm:gap-3">
+    <div class="nutry-card p-3 sm:p-4">
+      <p class="text-xs font-medium text-base-content/60 sm:text-sm">Posição</p>
+      <p class="mt-2 text-xl font-bold text-primary sm:text-2xl"><%= @participant_rank ? "#{@participant_rank}º" : "-" %></p>
+    </div>
+
+    <div class="nutry-card p-3 sm:p-4">
+      <p class="text-sm font-medium text-base-content/60">Pontos</p>
+      <p class="mt-2 text-xl font-bold text-base-content sm:text-2xl"><%= @participant_ranking_item&.total_points || 0 %></p>
+    </div>
+
+    <div class="nutry-card p-3 sm:p-4">
+      <p class="text-xs font-medium text-base-content/60 sm:text-sm">Dias ativos</p>
+      <p class="mt-2 text-xl font-bold text-base-content sm:text-2xl"><%= @participant_ranking_item&.active_days || 0 %></p>
+    </div>
+  </div>
+
+  <div class="tabs tabs-border tabs-lg">
+    <label class="tab gap-2 px-1 text-sm font-semibold sm:px-4 sm:text-base">
+      <input type="radio" name="participant_dashboard_tabs" checked="checked" />
+      Hoje
+      <span class="badge badge-outline badge-sm"><%= @today_tasks.size %></span>
+    </label>
+    <div class="tab-content pt-4">
+      <% if @today_tasks.any? %>
+        <div class="space-y-5">
+          <% task_sections.each do |state| %>
+            <% section_tasks = @today_tasks.select { |task_item| task_item.state == state } %>
+            <% next if section_tasks.empty? %>
+
+            <div>
+              <div class="space-y-3">
+                <% section_tasks.each do |task_item| %>
+                  <% task = task_item.challenge_task %>
+                  <% style = state_styles.fetch(task_item.state) %>
+
+                  <article class="nutry-card border <%= style[:panel] %> p-4">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <h3 class="text-base font-semibold tracking-normal text-base-content"><%= task.name %></h3>
+                          <span class="badge <%= style[:badge] %>"><%= style[:label] %></span>
+                        </div>
+
+                        <% if task.description.present? %>
+                          <p class="mt-2 text-sm leading-6 text-base-content/70"><%= task.description %></p>
+                        <% end %>
+
+                        <div class="mt-3 flex flex-wrap gap-2 text-xs font-medium text-base-content/60">
+                          <span><%= task.points %> pts</span>
+                          <% if task.allowed_start_time.present? %>
+                            <span>Das <%= task.allowed_start_time.strftime("%H:%M") %> às <%= task.allowed_end_time.strftime("%H:%M") %></span>
+                          <% else %>
+                            <span>Disponível o dia todo</span>
+                          <% end %>
+                        </div>
+                      </div>
+
+                      <% if task_item.state == "available" %>
+                        <div class="shrink-0">
+                          <%= button_to "Marcar tarefa",
+                            participant_checkins_path(@participant),
+                            params: { challenge_task_id: task.id },
+                            class: "btn btn-primary rounded-full" %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </article>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="nutry-card p-5">
+          <p class="text-sm leading-6 text-base-content/70">Nenhuma tarefa liberada para hoje.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <label class="tab gap-2 px-1 text-sm font-semibold sm:px-4 sm:text-base">
+      <input type="radio" name="participant_dashboard_tabs" />
+      Ranking
+      <span class="badge badge-outline badge-sm"><%= @ranking_items.size %></span>
+    </label>
+    <div class="tab-content pt-4">
+      <h2 class="mb-3 text-lg font-bold tracking-normal text-base-content">Ranking</h2>
+
+      <% if @ranking_items.any? %>
+        <div class="nutry-card divide-y divide-base-300 overflow-hidden">
+          <% @ranking_items.each_with_index do |ranking_item, index| %>
+            <div class="flex items-center justify-between gap-3 px-4 py-3 <%= "bg-primary/5" if ranking_item.participant.id == @participant.id %>">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-base-200 text-sm font-bold text-base-content">
+                  <%= index + 1 %>
+                </span>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-base-content"><%= ranking_item.participant.user.name %></p>
+                  <p class="text-xs text-base-content/55"><%= ranking_item.active_days %> dias ativos</p>
+                </div>
+              </div>
+
+              <p class="shrink-0 text-sm font-bold text-primary"><%= ranking_item.total_points %> pts</p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="nutry-card p-5">
+          <p class="text-sm leading-6 text-base-content/70">O ranking aparece quando participantes entram no desafio.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -24,6 +24,7 @@ module Rankings
     def build_ranking(challenge)
       challenge
         .participants
+        .includes(:user)
         .joins(join_checkins_and_challenge_tasks_sql(challenge))
         .select(ranking_select_sql)
         .group("participants.id")
