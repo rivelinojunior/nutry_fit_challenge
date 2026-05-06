@@ -14,8 +14,8 @@
   <%= render "admin/challenge_tasks/form", challenge:, task_form:, challenge_started: %>
 <% end %>
 
-<%= turbo_stream.replace "challenge_publication" do %>
-  <%= render "admin/challenge_tasks/publication", challenge:, tasks_by_date: %>
+<%= turbo_stream.replace "challenge_publish_action" do %>
+  <%= render "admin/challenge_tasks/publish_action", challenge:, tasks_by_date: %>
 <% end %>
 
 <%= turbo_stream.replace "challenge_task_list" do %>

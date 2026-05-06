@@ -1,0 +1,10 @@
+<div id="challenge_publish_action" class="shrink-0">
+  <% if challenge.present? %>
+    <%= button_to "Publicar",
+                  admin_publish_challenge_path(challenge),
+                  method: :patch,
+                  disabled: tasks_by_date.blank? || challenge.status == "published",
+                  data: { turbo_confirm: "Publicar este desafio com as tarefas atuais?" },
+                  class: "btn btn-primary rounded-full whitespace-nowrap" %>
+  <% end %>
+</div>

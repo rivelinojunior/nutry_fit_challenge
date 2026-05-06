@@ -1,4 +1,4 @@
-<div id="challenge_task_<%= kind %>">
+<div id="challenge_task_<%= kind %>" class="<%= "hidden" unless message.present? %>">
   <% if message.present? %>
     <div class="alert <%= kind == :notice ? "alert-success" : "alert-error" %>">
       <%= message %>

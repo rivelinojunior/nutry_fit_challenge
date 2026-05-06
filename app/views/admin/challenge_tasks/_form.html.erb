@@ -1,10 +1,12 @@
 <section id="challenge_task_form" class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
-  <h2 class="text-lg font-semibold">Gerar tarefas</h2>
-  <p class="mt-1 text-sm text-base-content/70">
-    Defina uma tarefa e escolha como ela será materializada no calendário do desafio.
-  </p>
+  <% recurrence_type = task_form["recurrence_type"] %>
+  <h2 class="text-lg font-semibold">Nova tarefa</h2>
 
-  <%= form_with scope: :challenge_task, url: challenge.present? ? admin_challenge_tasks_path(challenge) : "#", method: :post, class: "mt-5 grid gap-4" do |form| %>
+  <%= form_with scope: :challenge_task,
+                url: challenge.present? ? admin_challenge_tasks_path(challenge) : "#",
+                method: :post,
+                class: "mt-5 grid gap-4",
+                data: { controller: "challenge-task-recurrence" } do |form| %>
     <fieldset class="grid gap-4" <%= "disabled" if challenge.blank? || challenge_started %>>
       <div>
         <%= form.label :name, "Nome", class: "label" %>
@@ -24,12 +26,34 @@
 
         <div>
           <%= form.label :start_time, "Início", class: "label" %>
-          <%= form.time_field :start_time, value: task_form["start_time"], class: "input input-bordered w-full" %>
+          <%= form.text_field :start_time,
+                              value: task_form["start_time"],
+                              placeholder: "00:00",
+                              inputmode: "numeric",
+                              maxlength: 5,
+                              pattern: "([01][0-9]|2[0-3]):[0-5][0-9]",
+                              title: "Use o formato 24h, como 08:30 ou 17:45",
+                              class: "input input-bordered w-full",
+                              data: {
+                                controller: "time-input",
+                                action: "input->time-input#sanitize blur->time-input#complete"
+                              } %>
         </div>
 
         <div>
           <%= form.label :end_time, "Fim", class: "label" %>
-          <%= form.time_field :end_time, value: task_form["end_time"], class: "input input-bordered w-full" %>
+          <%= form.text_field :end_time,
+                              value: task_form["end_time"],
+                              placeholder: "00:00",
+                              inputmode: "numeric",
+                              maxlength: 5,
+                              pattern: "([01][0-9]|2[0-3]):[0-5][0-9]",
+                              title: "Use o formato 24h, como 08:30 ou 17:45",
+                              class: "input input-bordered w-full",
+                              data: {
+                                controller: "time-input",
+                                action: "input->time-input#sanitize blur->time-input#complete"
+                              } %>
         </div>
       </div>
 
@@ -38,24 +62,28 @@
         <%= form.select :recurrence_type,
                         options_for_select([ [ "Todos os dias", "daily" ], [ "Dias da semana", "weekdays" ], [ "Data específica", "specific_date" ] ], task_form["recurrence_type"]),
                         {},
-                        class: "select select-bordered w-full" %>
+                        class: "select select-bordered w-full",
+                        data: {
+                          action: "challenge-task-recurrence#update",
+                          challenge_task_recurrence_target: "recurrenceType"
+                        } %>
       </div>
 
-      <div>
+      <div class="<%= "hidden" unless recurrence_type == "weekdays" %>" data-challenge-task-recurrence-target="weekdays">
         <span class="label">Dias da semana</span>
         <div class="grid gap-2 sm:grid-cols-4">
           <% [ [ "Dom", 0 ], [ "Seg", 1 ], [ "Ter", 2 ], [ "Qua", 3 ], [ "Qui", 4 ], [ "Sex", 5 ], [ "Sáb", 6 ] ].each do |label, value| %>
             <label class="flex items-center gap-2 rounded-md border border-base-300 px-3 py-2 text-sm">
-              <%= check_box_tag "challenge_task[weekdays][]", value, task_form.fetch("weekdays", []).map(&:to_s).include?(value.to_s), class: "checkbox checkbox-primary checkbox-sm" %>
+              <%= check_box_tag "challenge_task[weekdays][]", value, task_form.fetch("weekdays", []).map(&:to_s).include?(value.to_s), class: "checkbox checkbox-primary checkbox-sm", disabled: recurrence_type != "weekdays" %>
               <span><%= label %></span>
             </label>
           <% end %>
         </div>
       </div>
 
-      <div>
+      <div class="<%= "hidden" unless recurrence_type == "specific_date" %>" data-challenge-task-recurrence-target="specificDate">
         <%= form.label :specific_date, "Data específica", class: "label" %>
-        <%= form.date_field :specific_date, value: task_form["specific_date"], min: challenge&.start_date, max: challenge&.end_date, class: "input input-bordered w-full" %>
+        <%= form.date_field :specific_date, value: task_form["specific_date"], min: challenge&.start_date, max: challenge&.end_date, class: "input input-bordered w-full", disabled: recurrence_type != "specific_date" %>
       </div>
     </fieldset>
 
@@ -65,6 +93,6 @@
       <p class="text-sm text-warning">Nenhum desafio encontrado para este usuário.</p>
     <% end %>
 
-    <%= form.submit "Gerar tarefas", disabled: challenge.blank? || challenge_started, class: "btn btn-primary rounded-full sm:w-fit" %>
+    <%= form.submit "Adicionar Tarefa", disabled: challenge.blank? || challenge_started, class: "btn btn-primary rounded-full sm:w-fit" %>
   <% end %>
 </section>

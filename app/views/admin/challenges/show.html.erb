@@ -1,13 +1,13 @@
-<% content_for :title, "Tarefas do desafio" %>
+<% content_for :title, @challenge&.name || "Tarefas do desafio" %>
 
 <section class="mx-auto flex w-full max-w-5xl flex-col gap-6">
-  <header class="flex flex-col gap-4 rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+  <header class="flex flex-col gap-4 rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm sm:flex-row sm:items-stretch sm:justify-between">
     <div>
       <p class="text-sm font-medium text-primary">Admin</p>
-      <h1 class="text-2xl font-semibold text-base-content">Tarefas do desafio</h1>
+      <h1 class="text-2xl font-semibold text-base-content"><%= @challenge&.name || "Tarefas do desafio" %></h1>
       <% if @challenge.present? %>
         <p class="mt-1 text-sm text-base-content/70">
-          <%= @challenge.name %> · <%= @challenge.start_date.strftime("%d/%m/%Y") %> até <%= @challenge.end_date.strftime("%d/%m/%Y") %>
+          <%= @challenge.start_date.strftime("%d/%m/%Y") %> até <%= @challenge.end_date.strftime("%d/%m/%Y") %>
         </p>
         <p class="mt-2 text-sm font-semibold text-base-content">
           Código: <span class="font-mono"><%= @challenge.challenge_code %></span>
@@ -17,15 +17,19 @@
       <% end %>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2">
-      <% if @challenge.present? %>
-        <span class="badge <%= @challenge.status == "published" ? "badge-success" : "badge-outline" %>">
-          <%= @challenge.status == "published" ? "Publicado" : "Rascunho" %>
-        </span>
-        <% if @challenge_started %>
-          <span class="badge badge-warning">Iniciado</span>
+    <div class="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-between">
+      <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+        <% if @challenge.present? %>
+          <span class="badge <%= @challenge.status == "published" ? "badge-success" : "badge-outline" %>">
+            <%= @challenge.status == "published" ? "Publicado" : "Rascunho" %>
+          </span>
+          <% if @challenge_started %>
+            <span class="badge badge-warning">Iniciado</span>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
+
+      <%= render "admin/challenge_tasks/publish_action", challenge: @challenge, tasks_by_date: @tasks_by_date %>
     </div>
   </header>
 
@@ -33,10 +37,7 @@
   <%= render "admin/challenge_tasks/flash", message: alert, kind: :alert %>
   <%= render "admin/challenge_tasks/errors", errors: [] %>
 
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)]">
-    <%= render "admin/challenge_tasks/form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
-    <%= render "admin/challenge_tasks/publication", challenge: @challenge, tasks_by_date: @tasks_by_date %>
-  </div>
+  <%= render "admin/challenge_tasks/form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
 
   <%= render "admin/challenge_tasks/task_list", challenge: @challenge, tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
 </section>

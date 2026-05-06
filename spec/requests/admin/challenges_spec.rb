@@ -68,7 +68,7 @@ RSpec.describe "Admin::Challenges" do
       it "shows the generation form" do
         get admin_challenge_path(challenge)
 
-        expect(response.body).to include("Gerar tarefas")
+        expect(response.body).to include("Nova tarefa")
       end
 
       it "shows the generated task list" do
