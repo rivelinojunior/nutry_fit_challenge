@@ -14,12 +14,27 @@
         password_confirmation: "Confirmação de senha"
         current_password: "Senha atual"
         remember_me: "Manter conectado"
+  activemodel:
+    attributes:
+      admin/generate_challenge_tasks_process/input:
+        challenge_id: "Desafio"
+        user_id: "Usuário"
+        name: "Nome"
+        description: "Descrição"
+        points: "Pontos"
+        start_time: "Início"
+        end_time: "Fim"
+        recurrence_type: "Recorrência"
+        weekdays: "Dias da semana"
+        specific_date: "Data específica"
   errors:
     format: "%{attribute} %{message}"
     messages:
       blank: "não pode ficar em branco"
       confirmation: "não confere"
+      greater_than: "deve ser maior que %{count}"
       invalid: "não é válido"
+      not_an_integer: "deve ser um número inteiro"
       taken: "já está em uso"
       too_short:
         one: "é muito curta (mínimo: 1 caractere)"

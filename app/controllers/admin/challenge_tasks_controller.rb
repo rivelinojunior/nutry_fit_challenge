@@ -58,11 +58,15 @@ module Admin
     end
 
     def render_failure(errors, challenge)
-      prepare_view_state(challenge:, task_form: submitted_task_form)
+      prepare_view_state(challenge: challenge || fallback_challenge, task_form: submitted_task_form)
       respond_to do |format|
         format.turbo_stream { render_task_stream(errors:, status: :unprocessable_entity) }
         format.html { redirect_to admin_challenge_path(params[:challenge_id]), alert: errors.to_sentence }
       end
+    end
+
+    def fallback_challenge
+      current_user.challenges.find_by(id: params[:challenge_id])
     end
 
     def render_task_stream(message: nil, errors: [], status: :ok)

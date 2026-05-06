@@ -1,7 +1,7 @@
 module Admin
   class RemoveChallengeTaskProcess < Solid::Process
     CHALLENGE_TASK_NOT_FOUND_ERROR = "Tarefa não encontrada.".freeze
-    ALREADY_STARTED_ERROR = "Challenge has already started".freeze
+    ALREADY_STARTED_ERROR = "O desafio já começou.".freeze
 
     input do
       attribute :challenge_id, :integer

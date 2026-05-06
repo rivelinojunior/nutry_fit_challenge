@@ -3,9 +3,9 @@ module Admin
     RECURRENCE_TYPES = %w[daily weekdays specific_date].freeze
     WEEKDAYS = (0..6).freeze
 
-    CHALLENGE_NOT_FOUND_ERROR = "Challenge not found".freeze
-    ALREADY_STARTED_ERROR = "Challenge has already started".freeze
-    SPECIFIC_DATE_OUT_OF_RANGE_ERROR = "Specific date must be within the challenge period".freeze
+    CHALLENGE_NOT_FOUND_ERROR = "Desafio não encontrado.".freeze
+    ALREADY_STARTED_ERROR = "O desafio já começou.".freeze
+    SPECIFIC_DATE_OUT_OF_RANGE_ERROR = "A data específica deve estar dentro do período do desafio.".freeze
 
     input do
       attribute :challenge_id, :integer
@@ -25,20 +25,20 @@ module Admin
 
       validate do
         unless (start_time.blank? && end_time.blank?) || (start_time.present? && end_time.present?)
-          errors.add(:base, "Start time and end time must be provided together")
+          errors.add(:base, "Informe início e fim juntos.")
         end
 
-        errors.add(:end_time, "must be greater than start time") if start_time.present? && end_time.present? && end_time <= start_time
+        errors.add(:end_time, "deve ser maior que o início") if start_time.present? && end_time.present? && end_time <= start_time
 
         if recurrence_type == "weekdays"
           if weekdays.blank?
-            errors.add(:weekdays, "can't be blank")
+            errors.add(:weekdays, "devem ser selecionados")
           elsif !weekdays.respond_to?(:all?) || !weekdays.all? { |weekday| WEEKDAYS.cover?(weekday) }
-            errors.add(:weekdays, "must contain values from 0 to 6")
+            errors.add(:weekdays, "devem conter valores de 0 a 6")
           end
         end
 
-        errors.add(:specific_date, "can't be blank") if recurrence_type == "specific_date" && specific_date.blank?
+        errors.add(:specific_date, :blank) if recurrence_type == "specific_date" && specific_date.blank?
       end
     end
 

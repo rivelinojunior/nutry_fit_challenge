@@ -168,7 +168,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:errors]).to contain_exactly("Challenge not found")
+        expect(result[:errors]).to contain_exactly("Desafio não encontrado.")
       end
 
       it "does not create tasks" do
@@ -202,7 +202,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:errors]).to contain_exactly("Challenge has already started")
+        expect(result[:errors]).to contain_exactly("O desafio já começou.")
       end
 
       it "does not create tasks" do
@@ -286,7 +286,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:base]).to include("Start time and end time must be provided together")
+        expect(result[:input].errors[:base]).to include("Informe início e fim juntos.")
       end
     end
 
@@ -298,7 +298,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:base]).to include("Start time and end time must be provided together")
+        expect(result[:input].errors[:base]).to include("Informe início e fim juntos.")
       end
     end
 
@@ -311,7 +311,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:end_time]).to include("must be greater than start time")
+        expect(result[:input].errors[:end_time]).to include("deve ser maior que o início")
       end
     end
 
@@ -324,7 +324,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:end_time]).to include("must be greater than start time")
+        expect(result[:input].errors[:end_time]).to include("deve ser maior que o início")
       end
     end
 
@@ -337,7 +337,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:weekdays]).to include("can't be blank")
+        expect(result[:input].errors[:weekdays]).to include("devem ser selecionados")
       end
     end
 
@@ -350,7 +350,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:weekdays]).to include("can't be blank")
+        expect(result[:input].errors[:weekdays]).to include("devem ser selecionados")
       end
     end
 
@@ -363,7 +363,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:weekdays]).to include("must contain values from 0 to 6")
+        expect(result[:input].errors[:weekdays]).to include("devem conter valores de 0 a 6")
       end
     end
 
@@ -376,7 +376,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:weekdays]).to include("must contain values from 0 to 6")
+        expect(result[:input].errors[:weekdays]).to include("devem conter valores de 0 a 6")
       end
     end
 
@@ -389,7 +389,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:input].errors[:specific_date]).to include("can't be blank")
+        expect(result[:input].errors[:specific_date]).to include("não pode ficar em branco")
       end
     end
 
@@ -402,7 +402,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:errors]).to contain_exactly("Specific date must be within the challenge period")
+        expect(result[:errors]).to contain_exactly("A data específica deve estar dentro do período do desafio.")
       end
 
       it "does not create tasks" do

@@ -48,7 +48,7 @@ RSpec.describe Admin::RemoveChallengeTaskProcess do
       end
 
       it "returns a clear error" do
-        expect(result[:errors]).to contain_exactly("Challenge has already started")
+        expect(result[:errors]).to contain_exactly("O desafio já começou.")
       end
 
       it "does not remove the task" do

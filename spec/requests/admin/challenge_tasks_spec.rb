@@ -108,7 +108,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows validation errors" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Name não pode ficar em branco")
+        expect(response.body).to include("Nome não pode ficar em branco")
       end
     end
 
@@ -135,7 +135,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the weekday validation error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(CGI.unescapeHTML(response.body)).to include("Weekdays can't be blank")
+        expect(CGI.unescapeHTML(response.body)).to include("Dias da semana devem ser selecionados")
       end
     end
 
@@ -156,7 +156,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the weekday range error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Weekdays must contain values from 0 to 6")
+        expect(response.body).to include("Dias da semana devem conter valores de 0 a 6")
       end
     end
 
@@ -177,7 +177,17 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the paired time validation error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Start time and end time must be provided together")
+        expect(response.body).to include("Informe início e fim juntos.")
+      end
+
+      it "keeps the challenge form enabled and the generated tasks visible" do
+        create(:challenge_task, challenge:, name: "Caminhada", scheduled_on: challenge.start_date)
+
+        post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
+
+        body = CGI.unescapeHTML(response.body)
+        expect(body).to include("Caminhada")
+        expect(body).not_to include("Nenhum desafio encontrado para este usuário.")
       end
     end
 
@@ -198,7 +208,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the time order validation error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("End time must be greater than start time")
+        expect(response.body).to include("Fim deve ser maior que o início")
       end
     end
 
@@ -225,7 +235,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the date range error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Specific date must be within the challenge period")
+        expect(response.body).to include("A data específica deve estar dentro do período do desafio.")
       end
     end
 
@@ -252,7 +262,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows not found" do
         post admin_challenge_tasks_path(0), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Challenge not found")
+        expect(response.body).to include("Desafio não encontrado.")
       end
     end
 
@@ -281,7 +291,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the process error" do
         post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
 
-        expect(response.body).to include("Challenge has already started")
+        expect(response.body).to include("O desafio já começou.")
       end
     end
   end
@@ -317,7 +327,7 @@ RSpec.describe "Admin challenge tasks" do
       it "shows the process error" do
         delete admin_challenge_task_path(challenge, task), as: :turbo_stream
 
-        expect(response.body).to include("Challenge has already started")
+        expect(response.body).to include("O desafio já começou.")
       end
     end
 
