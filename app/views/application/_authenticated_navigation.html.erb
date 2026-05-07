@@ -22,7 +22,8 @@
 
     <% if current_challenge.present? %>
       <li>
-        <%= link_to root_path, class: "grid min-h-14 grid-cols-[3rem_1fr] items-center gap-4 rounded-full bg-[#f2f2f2] py-2 pl-[10px] pr-4 transition hover:bg-[#ededed] focus:bg-[#ededed]" do %>
+        <%= link_to root_path(challenge_id: current_challenge.id, participant_id: current_participant.id),
+          class: "grid min-h-14 grid-cols-[3rem_1fr] items-center gap-4 rounded-full bg-[#f2f2f2] py-2 pl-[10px] pr-4 transition hover:bg-[#ededed] focus:bg-[#ededed]" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="size-8 shrink-0 justify-self-center" viewBox="0 0 512 512" fill="none" aria-hidden="true">
             <path d="M352 274C354 271 358 271 360 274L511 502C514 506 511 512 506 512H198C193 512 190 506 193 502L352 274Z" fill="#546F78" />
             <path d="M360 274L511 502C514 506 511 512 506 512H424L302 317L352 274C354 271 358 271 360 274Z" fill="#4d4d4d" />

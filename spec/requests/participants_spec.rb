@@ -75,6 +75,44 @@ RSpec.describe "Participants" do
 
         expect(response.body).to include(challenge.name)
       end
+
+      it "links the menu challenge item to the selected participant" do
+        get root_path
+
+        expect(response.body).to include("href=\"/?challenge_id=#{challenge.id}&amp;participant_id=#{participant.id}\"")
+      end
+    end
+
+    context "when the user also has a completed challenge joined later" do
+      let(:current_challenge) do
+        create(
+          :challenge,
+          name: "Desafio de Movimento",
+          status: "published",
+          start_date: Date.current,
+          end_date: Date.current + 6.days
+        )
+      end
+      let(:completed_challenge) do
+        create(
+          :challenge,
+          name: "Desafio Antigo",
+          status: "published",
+          start_date: Date.current - 14.days,
+          end_date: Date.current - 1.day
+        )
+      end
+
+      before do
+        create(:participant, user:, challenge: current_challenge, joined_at: 2.days.ago)
+        create(:participant, user:, challenge: completed_challenge, joined_at: 1.day.ago)
+      end
+
+      it "renders the current challenge dashboard" do
+        get root_path
+
+        expect(response.body).to include("Desafio de Movimento")
+      end
     end
 
     context "when the user's challenge has not started" do

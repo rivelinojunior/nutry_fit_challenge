@@ -38,7 +38,13 @@ class ChallangeDashboardController < ApplicationController
   def find_participant
     participant_scope = current_user.participants.includes(:challenge)
 
-    return participant_scope.order(joined_at: :desc).first if params[:participant_id].blank?
+    if params[:participant_id].blank?
+      return participant_scope
+        .joins(:challenge)
+        .where(challenges: { end_date: Date.current.. })
+        .order(joined_at: :desc)
+        .first
+    end
 
     participant_scope.find_by!(
       id: params[:participant_id],
