@@ -1,11 +1,23 @@
 <% if notice.present? %>
-  <div class="alert alert-success mb-5 text-sm">
+  <div class="alert alert-success relative mb-5 pr-12 text-sm transition-opacity duration-200" data-controller="flash-timeout">
     <span><%= notice %></span>
+    <button type="button" class="btn btn-ghost btn-xs btn-circle absolute right-2 top-2" aria-label="Fechar mensagem" data-action="flash-timeout#dismiss">
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+    </button>
   </div>
 <% end %>
 
 <% if alert.present? %>
-  <div class="alert alert-error mb-5 text-sm">
+  <div class="alert alert-error relative mb-5 pr-12 text-sm transition-opacity duration-200" data-controller="flash-timeout">
     <span><%= alert %></span>
+    <button type="button" class="btn btn-ghost btn-xs btn-circle absolute right-2 top-2" aria-label="Fechar mensagem" data-action="flash-timeout#dismiss">
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+    </button>
   </div>
 <% end %>
