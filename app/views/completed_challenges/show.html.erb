@@ -1,0 +1,130 @@
+<% content_for :title, "#{@challenge.name} | Concluído" %>
+
+<% content_for :authenticated_header do %>
+  <header class="w-full bg-base-200">
+    <div class="mx-auto mt-1 flex h-14 w-full max-w-6xl items-center px-4 sm:px-6">
+      <%= link_to completed_challenges_path, class: "btn btn-ghost btn-square", aria: { label: "Voltar para desafios concluídos" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      <% end %>
+    </div>
+  </header>
+<% end %>
+
+<% top_ranking_items = @ranking_items.first(3) %>
+<% remaining_ranking_items = @ranking_items.drop(3) %>
+<% podium_items = [[2, top_ranking_items.second], [1, top_ranking_items.first], [3, top_ranking_items.third]].select { |_rank, item| item.present? } %>
+<% podium_styles = {
+  1 => { avatar: "border-2 border-primary bg-primary text-primary-content shadow-nutry-card", bar: "bg-primary/45", height: "h-36 sm:h-40", label: "#1" },
+  2 => { avatar: "border border-base-300 bg-base-200 text-base-content", bar: "bg-base-300", height: "h-28 sm:h-32", label: "#2" },
+  3 => { avatar: "border border-base-300 bg-base-200 text-base-content", bar: "bg-base-300", height: "h-24 sm:h-28", label: "#3" }
+} %>
+
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-4 sm:py-8">
+  <% if alert.present? %>
+    <div class="alert alert-error relative pr-12 transition-opacity duration-200" data-controller="flash-timeout">
+      <span><%= alert %></span>
+      <button type="button" class="btn btn-ghost btn-xs btn-circle absolute right-2 top-2" aria-label="Fechar mensagem" data-action="flash-timeout#dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+  <% end %>
+
+  <div>
+    <h1 class="mt-1 text-2xl font-bold tracking-normal text-base-content sm:text-3xl"><%= @challenge.name %></h1>
+    <p class="mt-2 text-sm text-base-content/65"><%= @challenge.end_date.strftime("%d/%m/%Y") %></p>
+  </div>
+
+  <div class="flex flex-wrap items-start gap-2 sm:gap-3">
+    <div class="nutry-card flex w-fit items-center gap-3 rounded-full px-4 py-3">
+      <p class="text-sm font-semibold text-base-content/60 sm:text-base">Posição</p>
+      <span class="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
+          <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
+          <path d="M18 9h1.5a1 1 0 0 0 0-2H18" />
+          <path d="M4 22h16" />
+          <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+          <path d="M6 9H4.5a1 1 0 0 1 0-2H6" />
+        </svg>
+      </span>
+      <p class="text-xl font-bold text-base-content"><%= @completed_challenge_item.rank ? "#{@completed_challenge_item.rank}º" : "-" %></p>
+    </div>
+
+    <div class="nutry-card flex w-fit items-center gap-3 rounded-full px-4 py-3">
+      <p class="text-sm font-semibold text-base-content/60 sm:text-base">Pontos</p>
+      <span class="flex size-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-500" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.12 2.12 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.14a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16z" />
+        </svg>
+      </span>
+      <p class="text-xl font-bold text-base-content"><%= @completed_challenge_item.total_points %></p>
+    </div>
+  </div>
+
+  <% if @ranking_items.any? %>
+    <div class="space-y-4">
+      <div class="nutry-card overflow-hidden p-4 sm:p-5">
+        <div class="flex min-h-64 items-end justify-center gap-2 sm:gap-4">
+          <% podium_items.each do |rank, ranking_item| %>
+            <% participant_name = (ranking_item.participant.user.name.presence || "Participante").split.first %>
+            <% participant_initial = participant_name.first.upcase %>
+            <% style = podium_styles.fetch(rank) %>
+
+            <div class="flex min-w-0 flex-1 flex-col items-center">
+              <div class="mb-2 flex min-w-0 flex-col items-center">
+                <div class="flex size-16 items-center justify-center rounded-full text-2xl font-bold sm:size-20 sm:text-3xl <%= style[:avatar] %>">
+                  <%= participant_initial %>
+                </div>
+                <p class="mt-2 w-full max-w-24 truncate text-center text-xs font-bold text-base-content sm:max-w-32 sm:text-sm"><%= participant_name %></p>
+                <span class="mt-1 inline-flex items-center rounded-full border border-base-300 bg-base-100 px-2 py-1 text-[0.68rem] font-medium text-base-content sm:text-xs">
+                  <%= ranking_item.total_points %>
+                </span>
+              </div>
+
+              <div class="flex w-full max-w-24 items-center justify-center rounded-t-3xl text-lg font-medium text-base-content sm:max-w-32 <%= style[:height] %> <%= style[:bar] %>">
+                <%= style[:label] %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if remaining_ranking_items.any? %>
+        <div class="space-y-3">
+          <% remaining_ranking_items.each_with_index do |ranking_item, index| %>
+            <% rank = index + 4 %>
+            <% participant_name = (ranking_item.participant.user.name.presence || "Participante").split.first %>
+            <% participant_initial = participant_name.first.upcase %>
+            <% ranking_panel_style = ranking_item.participant.id == @participant.id ? "border-primary/40 bg-primary/5" : "border-base-300 bg-base-100" %>
+
+            <div class="nutry-card flex items-center justify-between gap-3 border p-4 <%= ranking_panel_style %>">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="w-8 shrink-0 text-center text-sm font-medium text-base-content">#<%= rank %></span>
+                <span class="flex size-12 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-200 text-lg font-bold text-base-content">
+                  <%= participant_initial %>
+                </span>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-bold text-base-content"><%= participant_name %></p>
+                  <span class="mt-1 inline-flex items-center rounded-full border border-base-300 bg-base-100 px-2 py-0.5 text-[0.68rem] font-medium text-base-content">
+                    <%= ranking_item.total_points %>
+                  </span>
+                </div>
+              </div>
+
+              <p class="shrink-0 text-xs font-semibold text-base-content/55"><%= ranking_item.active_days %> dias</p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="nutry-card p-5">
+      <p class="text-sm leading-6 text-base-content/70">O ranking final aparece quando participantes entram no desafio.</p>
+    </div>
+  <% end %>
+</section>

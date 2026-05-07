@@ -41,13 +41,13 @@
     <% end %>
 
     <li>
-      <span class="grid min-h-14 cursor-not-allowed grid-cols-[3rem_1fr] items-center gap-4 rounded-full py-2 pr-4 text-base-content" aria-disabled="true">
+      <%= link_to completed_challenges_path, class: "grid min-h-14 grid-cols-[3rem_1fr] items-center gap-4 rounded-full py-2 pr-4 transition hover:bg-base-200 focus:bg-base-200" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="size-7 shrink-0 justify-self-center" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z" />
           <path d="M4 22V15" />
         </svg>
         <span class="text-base font-normal">Desafios concluídos</span>
-      </span>
+      <% end %>
     </li>
 
     <li>

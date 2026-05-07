@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       to: "waiting_room#new",
       as: :challenge_participant_waiting_room
   post "participants/:participant_id/checkins", to: "checkins#create", as: :participant_checkins
+  resources :completed_challenges, only: %i[index show]
   get "settings", to: "settings#show", as: :settings
   resource :settings_password, only: %i[edit update], path: "settings/password"
   resource :settings_account_cancellation, only: :show, path: "settings/account_cancellation"
