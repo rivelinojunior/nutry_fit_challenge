@@ -18,7 +18,7 @@ module CompletedChallenges
 
     def completed_participants
       Participant
-        .includes(:user, :challenge)
+        .includes(:user, challenge: :participants)
         .joins(:challenge)
         .where(user_id:)
         .where(challenges: { end_date: ...Date.current })

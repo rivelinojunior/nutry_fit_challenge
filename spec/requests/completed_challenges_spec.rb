@@ -37,6 +37,7 @@ RSpec.describe "Completed challenges" do
 
       before do
         sign_in user
+        create(:participant, challenge:)
         create(:checkin, participant:, challenge_task:)
       end
 
@@ -46,10 +47,28 @@ RSpec.describe "Completed challenges" do
         expect(response.body).to include("Desafio de Maio")
       end
 
-      it "renders the final score" do
+      it "renders the participant count" do
         get completed_challenges_path
 
-        expect(response.body).to include("10 pts")
+        expect(response.body).to include("2 participantes")
+      end
+
+      it "renders the challenge duration" do
+        get completed_challenges_path
+
+        expect(response.body).to include("6 dias")
+      end
+
+      it "renders the details action" do
+        get completed_challenges_path
+
+        expect(response.body).to include("Detalhes")
+      end
+
+      it "does not render the final position" do
+        get completed_challenges_path
+
+        expect(response.body).not_to include("#1")
       end
 
       it "links to the completed challenge page" do
