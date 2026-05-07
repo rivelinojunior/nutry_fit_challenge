@@ -1,15 +1,25 @@
 <% content_for :title, "Minha conta | Nutry.fit Challenge" %>
 
-<section class="mx-auto w-full max-w-2xl py-8">
-  <%= render "devise/shared/brand" %>
-
-  <div class="nutry-card p-6 sm:p-8">
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-primary">Perfil</p>
-      <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content">Minha conta</h1>
-      <p class="mt-2 text-sm leading-6 text-base-content/70">Atualize seus dados de acesso ao desafio.</p>
+<% content_for :authenticated_header do %>
+  <header class="w-full bg-base-200">
+    <div class="mx-auto flex h-14 w-full max-w-6xl items-center px-4 sm:px-6">
+      <%= link_to settings_path, class: "btn btn-ghost btn-square", aria: { label: "Voltar para configurações" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      <% end %>
     </div>
+  </header>
+<% end %>
 
+<section class="mx-auto w-full max-w-xl px-4 pb-10 pt-8 sm:pt-12">
+  <div class="mb-8">
+    <p class="text-sm font-semibold text-primary">Configurações</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content">Minha conta</h1>
+    <p class="mt-2 text-sm leading-6 text-base-content/70">Atualize o nome exibido no desafio.</p>
+  </div>
+
+  <div class="nutry-card p-5 sm:p-6">
     <%= render "devise/shared/flash" %>
     <%= render "devise/shared/error_messages", resource: resource %>
 
@@ -21,55 +31,14 @@
 
       <div>
         <%= f.label :email, "E-mail", class: "label pb-2 text-sm font-medium" %>
-        <%= f.email_field :email, autocomplete: "email", placeholder: "voce@email.com", class: "input input-bordered w-full #{'input-error' if resource.errors[:email].any?}" %>
+        <%= f.email_field :email, autocomplete: "email", disabled: true, class: "input input-bordered w-full bg-base-200 text-base-content/60" %>
+        <p class="mt-2 text-xs text-base-content/60">O e-mail de acesso não pode ser alterado por aqui.</p>
       </div>
-
-      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-        <div class="alert alert-warning text-sm">
-          <span>Aguardando confirmação para <%= resource.unconfirmed_email %>.</span>
-        </div>
-      <% end %>
-
-      <div class="grid gap-5 sm:grid-cols-2">
-        <%= render "devise/shared/password_field",
-          form: f,
-          resource: resource,
-          attribute: :password,
-          label_text: "Nova senha",
-          autocomplete: "new-password",
-          hint: "Deixe em branco para manter a senha atual." %>
-
-        <%= render "devise/shared/password_field",
-          form: f,
-          resource: resource,
-          attribute: :password_confirmation,
-          label_text: "Confirmar nova senha",
-          autocomplete: "new-password" %>
-      </div>
-
-      <%= render "devise/shared/password_field",
-        form: f,
-        resource: resource,
-        attribute: :current_password,
-        label_text: "Senha atual",
-        autocomplete: "current-password",
-        hint: "Necessária para confirmar as alterações." %>
 
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
         <%= f.submit "Salvar alterações", class: "btn btn-primary rounded-full sm:min-w-48" %>
-        <%= link_to "Voltar", request.referer.presence || "/", class: "btn btn-ghost rounded-full" %>
+        <%= link_to "Voltar", settings_path, class: "btn btn-ghost rounded-full" %>
       </div>
     <% end %>
-  </div>
-
-  <div class="mt-6 nutry-card border-error/25 p-6 sm:p-8">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h2 class="text-base font-semibold text-base-content">Cancelar conta</h2>
-        <p class="mt-1 text-sm text-base-content/70">Essa ação remove seu acesso e não deve ser usada para sair de um desafio.</p>
-      </div>
-
-      <%= button_to "Cancelar conta", registration_path(resource_name), method: :delete, data: { turbo_confirm: "Tem certeza que deseja cancelar sua conta?" }, class: "btn btn-error btn-outline rounded-full" %>
-    </div>
   </div>
 </section>

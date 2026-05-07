@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: { registrations: "users/registrations" }
 
   namespace :admin do
     resources :challenges, only: %i[show new create edit update]
@@ -14,6 +14,9 @@ Rails.application.routes.draw do
       to: "waiting_room#new",
       as: :challenge_participant_waiting_room
   post "participants/:participant_id/checkins", to: "checkins#create", as: :participant_checkins
+  get "settings", to: "settings#show", as: :settings
+  resource :settings_password, only: %i[edit update], path: "settings/password"
+  resource :settings_account_cancellation, only: :show, path: "settings/account_cancellation"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

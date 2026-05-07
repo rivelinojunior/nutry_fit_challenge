@@ -1,0 +1,43 @@
+<% content_for :title, "Cancelar conta | Configurações" %>
+
+<% content_for :authenticated_header do %>
+  <header class="w-full bg-base-200">
+    <div class="mx-auto flex h-14 w-full max-w-6xl items-center px-4 sm:px-6">
+      <%= link_to settings_path, class: "btn btn-ghost btn-square", aria: { label: "Voltar para configurações" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      <% end %>
+    </div>
+  </header>
+<% end %>
+
+<section class="mx-auto w-full max-w-xl px-4 pb-10 pt-8 sm:pt-12">
+  <div class="mb-8">
+    <p class="text-sm font-semibold text-error">Configurações</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content">Cancelar conta</h1>
+    <p class="mt-2 text-sm leading-6 text-base-content/70">Antes de continuar, revise o que muda ao encerrar sua conta.</p>
+  </div>
+
+  <div class="nutry-card p-5 sm:p-6">
+    <div class="alert alert-warning items-start text-sm">
+      <span>Essa ação remove seu acesso ao Desafio Nutry.fit e encerra sua sessão.</span>
+    </div>
+
+    <div class="mt-5 space-y-3 text-sm leading-6 text-base-content/70">
+      <p>Depois do cancelamento, você não poderá entrar no app com este e-mail.</p>
+      <p>Seu acesso aos desafios, tarefas, check-ins e rankings vinculados à conta deixará de ficar disponível para você.</p>
+      <p>Para participar novamente, será necessário criar uma nova conta.</p>
+    </div>
+
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-start">
+      <%= button_to "Cancelar minha conta",
+        registration_path(:user),
+        method: :delete,
+        form: { class: "w-full sm:w-auto" },
+        data: { turbo_confirm: "Tem certeza que deseja cancelar sua conta?" },
+        class: "btn btn-error w-full rounded-full sm:w-52" %>
+      <%= link_to "Voltar", settings_path, class: "btn btn-ghost w-full rounded-full sm:w-52" %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+<% content_for :title, "Senha | Configurações" %>
+
+<% content_for :authenticated_header do %>
+  <header class="w-full bg-base-200">
+    <div class="mx-auto flex h-14 w-full max-w-6xl items-center px-4 sm:px-6">
+      <%= link_to settings_path, class: "btn btn-ghost btn-square", aria: { label: "Voltar para configurações" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      <% end %>
+    </div>
+  </header>
+<% end %>
+
+<section class="mx-auto w-full max-w-xl px-4 pb-10 pt-8 sm:pt-12">
+  <div class="mb-8">
+    <p class="text-sm font-semibold text-primary">Configurações</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content">Senha</h1>
+    <p class="mt-2 text-sm leading-6 text-base-content/70">Atualize apenas sua senha de acesso.</p>
+  </div>
+
+  <div class="nutry-card p-5 sm:p-6">
+    <%= render "devise/shared/flash" %>
+    <%= render "devise/shared/error_messages", resource: current_user %>
+
+    <%= form_with model: current_user, url: settings_password_path, method: :patch, class: "space-y-5" do |form| %>
+      <%= render "devise/shared/password_field",
+        form: form,
+        resource: current_user,
+        attribute: :current_password,
+        label_text: "Senha atual",
+        autocomplete: "current-password",
+        autofocus: true,
+        hint: "Necessária para confirmar a alteração." %>
+
+      <%= render "devise/shared/password_field",
+        form: form,
+        resource: current_user,
+        attribute: :password,
+        label_text: "Nova senha",
+        autocomplete: "new-password" %>
+
+      <%= render "devise/shared/password_field",
+        form: form,
+        resource: current_user,
+        attribute: :password_confirmation,
+        label_text: "Confirmar nova senha",
+        autocomplete: "new-password" %>
+
+      <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center">
+        <%= form.submit "Salvar senha", class: "btn btn-primary rounded-full sm:min-w-48" %>
+        <%= link_to "Cancelar", settings_path, class: "btn btn-ghost rounded-full" %>
+      </div>
+    <% end %>
+  </div>
+</section>
