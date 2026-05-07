@@ -25,11 +25,27 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="flex min-h-screen flex-col bg-base-200 font-sans text-base-content antialiased">
-    <%= render "application/authenticated_header" if user_signed_in? %>
+  <body class="min-h-screen bg-base-200 font-sans text-base-content antialiased">
+    <% if user_signed_in? %>
+      <div class="drawer">
+        <input id="authenticated-navigation" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex min-h-screen flex-col">
+          <%= render "application/authenticated_header" %>
 
-    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-3 sm:px-6 sm:py-8">
-      <%= yield %>
-    </main>
+          <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-3 sm:px-6 sm:py-8">
+            <%= yield %>
+          </main>
+        </div>
+
+        <div class="drawer-side z-50">
+          <label for="authenticated-navigation" aria-label="Fechar menu" class="drawer-overlay"></label>
+          <%= render "application/authenticated_navigation" %>
+        </div>
+      </div>
+    <% else %>
+      <main class="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 sm:py-8">
+        <%= yield %>
+      </main>
+    <% end %>
   </body>
 </html>
