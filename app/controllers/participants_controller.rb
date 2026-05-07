@@ -36,7 +36,7 @@ class ParticipantsController < ApplicationController
   end
 
   def participant_destination_path(participant)
-    return participant_dashboard_path(participant.challenge, participant) if challenge_started?(participant.challenge)
+    return root_path if challenge_started?(participant.challenge)
 
     challenge_participant_waiting_room_path(participant.challenge, participant)
   end

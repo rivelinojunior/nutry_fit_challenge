@@ -36,8 +36,47 @@ RSpec.describe "Participants" do
   end
 
   describe "GET /" do
-    it "renders the join screen" do
+    context "when the user is not participating in a challenge" do
+      it "redirects to the join screen" do
+        get root_path
+
+        expect(response).to redirect_to(join_path)
+      end
+    end
+
+    context "when the user is participating in a challenge" do
+      let(:challenge) { create(:challenge, status: "published", start_date: Date.current) }
+      let(:participant) { create(:participant, user:, challenge:) }
+
+      before do
+        participant
+      end
+
+      it "renders the participant dashboard" do
+        get root_path
+
+        expect(response.body).to include(challenge.name)
+      end
+    end
+
+    context "when the user's challenge has not started" do
+      let(:challenge) { create(:challenge, status: "published", start_date: Date.current + 1.day) }
+      let(:participant) { create(:participant, user:, challenge:) }
+
+      before do
+        participant
+      end
+
+      it "redirects into the participant dashboard flow" do
+        get root_path
+
+        expect(response).to redirect_to(challenge_participant_waiting_room_path(challenge, participant))
+      end
+    end
+
+    it "renders the join screen after following the fallback redirect" do
       get root_path
+      follow_redirect!
 
       expect(response.body).to include("Entrar em um desafio")
     end
@@ -127,7 +166,7 @@ RSpec.describe "Participants" do
       it "redirects to the dashboard" do
         post join_path, params: { challenge_code: challenge.challenge_code }
 
-        expect(response).to redirect_to(participant_dashboard_path(challenge, participant))
+        expect(response).to redirect_to(root_path)
       end
     end
   end
@@ -186,7 +225,7 @@ RSpec.describe "Participants" do
       it "redirects to the dashboard" do
         get challenge_participant_waiting_room_path(challenge, participant)
 
-        expect(response).to redirect_to(participant_dashboard_path(challenge, participant))
+        expect(response).to redirect_to(root_path)
       end
     end
 
@@ -201,7 +240,7 @@ RSpec.describe "Participants" do
     end
   end
 
-  describe "GET /challenges/:challenge_id/participants/:participant_id/dashboard" do
+  describe "GET / dashboard" do
     let(:current_time) { Time.zone.local(2026, 5, 6, 12, 0, 0) }
     let(:challenge) do
       create(
@@ -267,55 +306,55 @@ RSpec.describe "Participants" do
     end
 
     it "renders successfully" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response).to have_http_status(:ok)
     end
 
     it "renders the challenge name" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Desafio Maio")
     end
 
     it "renders today's task names" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Registrar água", "Caminhada", "Sono", "Alongamento")
     end
 
     it "renders the available task action" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Concluir")
     end
 
     it "renders the checked task state" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Feita")
     end
 
     it "renders the future task state" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Em breve")
     end
 
     it "renders the expired task state" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("Expirada")
     end
 
     it "renders task groups in state order" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to match(/Registrar água.*Sono.*Caminhada.*Alongamento/m)
     end
 
     it "renders the participant total points" do
-      get participant_dashboard_path(challenge, participant)
+      get root_path
 
       expect(response.body).to include("10")
     end
@@ -324,19 +363,9 @@ RSpec.describe "Participants" do
       let(:challenge) { create(:challenge, status: "published", start_date: Date.current + 1.day) }
 
       it "redirects to the waiting room" do
-        get participant_dashboard_path(challenge, participant)
+        get root_path
 
         expect(response).to redirect_to(challenge_participant_waiting_room_path(challenge, participant))
-      end
-    end
-
-    context "when the participant belongs to another user" do
-      let(:participant) { create(:participant, challenge:) }
-
-      it "returns not found" do
-        get participant_dashboard_path(challenge, participant)
-
-        expect(response).to have_http_status(:not_found)
       end
     end
   end
@@ -375,7 +404,7 @@ RSpec.describe "Participants" do
     it "redirects to the dashboard" do
       post participant_checkins_path(participant), params: { challenge_task_id: challenge_task.id }
 
-      expect(response).to redirect_to(participant_dashboard_path(challenge, participant))
+      expect(response).to redirect_to(root_path)
     end
 
     context "when the task is already checked" do

@@ -13,9 +13,6 @@ Rails.application.routes.draw do
   get "challenges/:challenge_id/participants/:participant_id/waiting_room",
       to: "waiting_room#new",
       as: :challenge_participant_waiting_room
-  get "challenges/:challenge_id/participants/:participant_id/dashboard",
-      to: "challange_dashboard#show",
-      as: :participant_dashboard
   post "participants/:participant_id/checkins", to: "checkins#create", as: :participant_checkins
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -28,5 +25,5 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  root "participants#join"
+  root "challange_dashboard#show"
 end

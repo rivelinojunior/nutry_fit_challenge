@@ -8,7 +8,7 @@ class WaitingRoomController < ApplicationController
     )
     @challenge = @participant.challenge
 
-    return redirect_to participant_dashboard_path(@challenge, @participant) if challenge_started?
+    return redirect_to root_path if challenge_started?
 
     @days_remaining = (@challenge.start_date - Date.current).to_i
   end

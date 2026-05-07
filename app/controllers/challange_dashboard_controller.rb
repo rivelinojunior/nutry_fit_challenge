@@ -2,10 +2,10 @@ class ChallangeDashboardController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @participant = current_user.participants.includes(:challenge).find_by!(
-      id: params[:participant_id],
-      challenge_id: params[:challenge_id]
-    )
+    @participant = find_participant
+
+    return redirect_to join_path if @participant.blank?
+
     @challenge = @participant.challenge
 
     unless challenge_started?
@@ -29,6 +29,17 @@ class ChallangeDashboardController < ApplicationController
   end
 
   private
+
+  def find_participant
+    participant_scope = current_user.participants.includes(:challenge)
+
+    return participant_scope.order(joined_at: :desc).first if params[:participant_id].blank?
+
+    participant_scope.find_by!(
+      id: params[:participant_id],
+      challenge_id: params[:challenge_id]
+    )
+  end
 
   def challenge_started?
     @challenge.start_date <= Date.current
