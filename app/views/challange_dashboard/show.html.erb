@@ -58,8 +58,8 @@
     </div>
   </div>
 
-  <div class="tabs tabs-border tabs-lg">
-    <label class="tab gap-2 px-1 text-sm font-semibold sm:px-4 sm:text-base">
+  <div class="nutry-dashboard-tabs tabs tabs-border gap-x-4 sm:tabs-lg sm:gap-x-0">
+    <label class="tab h-10 gap-2 px-0 text-sm font-semibold sm:h-auto sm:px-4 sm:pb-2 sm:text-base">
       <input type="radio" name="participant_dashboard_tabs" checked="checked" />
       Hoje
       <span class="badge badge-outline badge-sm"><%= @today_tasks.size %></span>
@@ -130,7 +130,7 @@
       <% end %>
     </div>
 
-    <label class="tab gap-2 px-1 text-sm font-semibold sm:px-4 sm:text-base">
+    <label class="tab h-10 gap-2 px-0 text-sm font-semibold sm:h-auto sm:px-4 sm:pb-2 sm:text-base">
       <input type="radio" name="participant_dashboard_tabs" />
       Ranking
       <span class="badge badge-outline badge-sm"><%= @ranking_items.size %></span>
@@ -140,40 +140,32 @@
       <% remaining_ranking_items = @ranking_items.drop(3) %>
       <% podium_items = [[2, top_ranking_items.second], [1, top_ranking_items.first], [3, top_ranking_items.third]].select { |_rank, item| item.present? } %>
       <% podium_styles = {
-        1 => { avatar: "border-primary bg-primary text-primary-content", bar: "bg-primary/45", height: "h-36 sm:h-40", label: "#1" },
-        2 => { avatar: "border-warning bg-warning/20 text-warning-content", bar: "bg-warning/65", height: "h-28 sm:h-32", label: "#2" },
-        3 => { avatar: "border-error bg-error/20 text-error", bar: "bg-error/40", height: "h-24 sm:h-28", label: "#3" }
+        1 => { avatar: "border-2 border-primary bg-primary text-primary-content shadow-nutry-card", bar: "bg-primary/45", height: "h-36 sm:h-40", label: "#1" },
+        2 => { avatar: "border border-base-300 bg-base-200 text-base-content", bar: "bg-base-300", height: "h-28 sm:h-32", label: "#2" },
+        3 => { avatar: "border border-base-300 bg-base-200 text-base-content", bar: "bg-base-300", height: "h-24 sm:h-28", label: "#3" }
       } %>
-
-      <div class="mb-4 flex items-center justify-between gap-3">
-        <h2 class="text-lg font-bold tracking-normal text-base-content">Ranking</h2>
-        <span class="badge badge-outline badge-sm"><%= @ranking_items.size %></span>
-      </div>
 
       <% if @ranking_items.any? %>
         <div class="space-y-4">
           <div class="nutry-card overflow-hidden p-4 sm:p-5">
             <div class="flex min-h-64 items-end justify-center gap-2 sm:gap-4">
               <% podium_items.each do |rank, ranking_item| %>
-                <% participant_name = ranking_item.participant.user.name.presence || "Participante" %>
+                <% participant_name = (ranking_item.participant.user.name.presence || "Participante").split.first %>
                 <% participant_initial = participant_name.first.upcase %>
                 <% style = podium_styles.fetch(rank) %>
 
                 <div class="flex min-w-0 flex-1 flex-col items-center">
                   <div class="mb-2 flex min-w-0 flex-col items-center">
-                    <div class="flex size-16 items-center justify-center rounded-full border-2 text-2xl font-bold shadow-nutry-card sm:size-20 sm:text-3xl <%= style[:avatar] %>">
+                    <div class="flex size-16 items-center justify-center rounded-full text-2xl font-bold sm:size-20 sm:text-3xl <%= style[:avatar] %>">
                       <%= participant_initial %>
                     </div>
                     <p class="mt-2 w-full max-w-24 truncate text-center text-xs font-bold text-base-content sm:max-w-32 sm:text-sm"><%= participant_name %></p>
-                    <span class="mt-1 inline-flex items-center gap-1 rounded-full border border-accent/25 bg-accent/10 px-2 py-1 text-[0.68rem] font-bold text-accent sm:text-xs">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="size-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M12 2 3 12l9 10 9-10L12 2Zm0 4.2 5.2 5.8-5.2 5.8L6.8 12 12 6.2Z" />
-                      </svg>
+                    <span class="mt-1 inline-flex items-center rounded-full border border-base-300 bg-base-100 px-2 py-1 text-[0.68rem] font-medium text-base-content sm:text-xs">
                       <%= ranking_item.total_points %>
                     </span>
                   </div>
 
-                  <div class="flex w-full max-w-28 items-center justify-center rounded-t-3xl text-lg font-extrabold text-base-content sm:max-w-36 <%= style[:height] %> <%= style[:bar] %>">
+                  <div class="flex w-full max-w-24 items-center justify-center rounded-t-3xl text-lg font-medium text-base-content sm:max-w-32 <%= style[:height] %> <%= style[:bar] %>">
                     <%= style[:label] %>
                   </div>
                 </div>
@@ -182,24 +174,22 @@
           </div>
 
           <% if remaining_ranking_items.any? %>
-            <div class="space-y-2">
+            <div class="space-y-3">
               <% remaining_ranking_items.each_with_index do |ranking_item, index| %>
                 <% rank = index + 4 %>
-                <% participant_name = ranking_item.participant.user.name.presence || "Participante" %>
+                <% participant_name = (ranking_item.participant.user.name.presence || "Participante").split.first %>
                 <% participant_initial = participant_name.first.upcase %>
+                <% ranking_panel_style = ranking_item.participant.id == @participant.id ? "border-primary/40 bg-primary/5" : "border-base-300 bg-base-100" %>
 
-                <div class="nutry-card flex items-center justify-between gap-3 px-4 py-3 <%= "border-primary/40 bg-primary/5" if ranking_item.participant.id == @participant.id %>">
+                <div class="nutry-card flex items-center justify-between gap-3 border p-4 <%= ranking_panel_style %>">
                   <div class="flex min-w-0 items-center gap-3">
-                    <span class="w-8 shrink-0 text-center text-sm font-extrabold text-base-content">#<%= rank %></span>
-                    <span class="flex size-12 shrink-0 items-center justify-center rounded-full border-2 border-accent/40 bg-accent/10 text-lg font-bold text-accent">
+                    <span class="w-8 shrink-0 text-center text-sm font-medium text-base-content">#<%= rank %></span>
+                    <span class="flex size-12 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-200 text-lg font-bold text-base-content">
                       <%= participant_initial %>
                     </span>
                     <div class="min-w-0">
                       <p class="truncate text-sm font-bold text-base-content"><%= participant_name %></p>
-                      <span class="mt-1 inline-flex items-center gap-1 rounded-full border border-accent/25 bg-base-100 px-2 py-0.5 text-[0.68rem] font-bold text-accent">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path d="M12 2 3 12l9 10 9-10L12 2Zm0 4.2 5.2 5.8-5.2 5.8L6.8 12 12 6.2Z" />
-                        </svg>
+                      <span class="mt-1 inline-flex items-center rounded-full border border-base-300 bg-base-100 px-2 py-0.5 text-[0.68rem] font-medium text-base-content">
                         <%= ranking_item.total_points %>
                       </span>
                     </div>

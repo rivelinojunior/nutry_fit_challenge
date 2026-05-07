@@ -136,6 +136,18 @@
 }
 
 @layer utilities {
+  .nutry-dashboard-tabs.tabs-border > .tab::before {
+    left: 0;
+    width: 100%;
+  }
+
+  @media (min-width: 40rem) {
+    .nutry-dashboard-tabs.tabs-border > .tab::before {
+      left: 10%;
+      width: 80%;
+    }
+  }
+
   .input:not(.input-error):focus,
   .input:not(.input-error):focus-within,
   .select:not(.select-error):focus,
