@@ -1,4 +1,5 @@
 class ChallangeDashboardController < ApplicationController
+  before_action :redirect_guest_to_sign_in
   before_action :authenticate_user!
 
   def show
@@ -29,6 +30,10 @@ class ChallangeDashboardController < ApplicationController
   end
 
   private
+
+  def redirect_guest_to_sign_in
+    redirect_to new_user_session_path unless user_signed_in?
+  end
 
   def find_participant
     participant_scope = current_user.participants.includes(:challenge)

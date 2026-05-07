@@ -36,6 +36,24 @@ RSpec.describe "Participants" do
   end
 
   describe "GET /" do
+    context "when the user is not signed in" do
+      before do
+        sign_out user
+      end
+
+      it "redirects to sign in" do
+        get root_path
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it "does not set an alert" do
+        get root_path
+
+        expect(flash[:alert]).to be_nil
+      end
+    end
+
     context "when the user is not participating in a challenge" do
       it "redirects to the join screen" do
         get root_path
