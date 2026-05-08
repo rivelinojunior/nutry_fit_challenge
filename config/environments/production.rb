@@ -59,7 +59,7 @@ Rails.application.configure do
 
   # Set the public app host used by links generated in mailer templates.
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APP_HOST"),
+    host: ENV["APP_HOST"],
     protocol: "https"
   }
 
