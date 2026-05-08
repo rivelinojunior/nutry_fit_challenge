@@ -334,7 +334,10 @@ RSpec.describe "Participants" do
         points: 5,
         scheduled_on: Date.current,
         allowed_start_time: nil,
-        allowed_end_time: nil
+        allowed_end_time: nil,
+        links: [
+          { "label" => "Grupo do WhatsApp", "url" => "https://chat.example.com/grupo" }
+        ]
       )
     end
     let!(:checked_task) do
@@ -425,6 +428,24 @@ RSpec.describe "Participants" do
       get root_path
 
       expect(response.body).to match(/Registrar água.*Sono.*Caminhada.*Alongamento/m)
+    end
+
+    it "renders today's task link labels" do
+      get root_path
+
+      expect(response.body).to include("Grupo do WhatsApp")
+    end
+
+    it "renders today's task link urls" do
+      get root_path
+
+      expect(response.body).to include('href="https://chat.example.com/grupo"')
+    end
+
+    it "renders today's task links to open in a new tab" do
+      get root_path
+
+      expect(response.body).to include('target="_blank"')
     end
 
     it "renders the participant total points" do
