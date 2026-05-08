@@ -1,0 +1,43 @@
+<div data-controller="install-prompt"
+     data-install-prompt-dismissed-key-value="nutryfit:pwa-install-prompt-dismissed:v1">
+  <dialog class="modal modal-bottom sm:modal-middle"
+          aria-labelledby="install-prompt-title"
+          data-install-prompt-target="dialog"
+          data-action="close->install-prompt#dismissFromDialog">
+    <div class="modal-box inset-x-0 mx-auto w-full max-w-none rounded-t-xl rounded-b-none border border-base-300 bg-base-100 p-5 shadow-nutry-card sm:w-11/12 sm:max-w-sm sm:rounded-xl">
+      <div class="mx-auto w-[70%] sm:w-full">
+        <div class="flex items-start gap-3">
+          <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12" />
+              <path d="m7 10 5 5 5-5" />
+              <path d="M5 21h14" />
+            </svg>
+          </span>
+
+          <div class="min-w-0">
+            <h2 id="install-prompt-title" class="text-lg font-bold tracking-normal text-base-content">Instale o Nutry.fit</h2>
+            <p class="mt-2 text-sm leading-6 text-base-content/70">Acesse o desafio mais rápido pela tela inicial do seu celular.</p>
+          </div>
+        </div>
+
+        <div class="modal-action mt-5 flex-col gap-2 sm:flex-row">
+          <button type="button"
+                  class="btn btn-primary rounded-full"
+                  data-action="install-prompt#install">
+            Instalar app
+          </button>
+          <button type="button"
+                  class="btn btn-ghost rounded-full"
+                  data-action="install-prompt#dismiss">
+            Agora não
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+      <button type="submit" aria-label="Fechar">Fechar</button>
+    </form>
+  </dialog>
+</div>

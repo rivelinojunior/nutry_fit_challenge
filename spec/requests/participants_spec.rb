@@ -33,6 +33,15 @@ RSpec.describe "Participants" do
 
       expect(response.body).to include("Abrir menu")
     end
+
+    it "renders the authenticated install prompt container" do
+      get join_path
+
+      document = Nokogiri::HTML(response.body)
+
+      expect(document.at_css("[data-controller='install-prompt']")).to be_present
+      expect(response.body).to include("Instale o Nutry.fit")
+    end
   end
 
   describe "GET /" do
@@ -51,6 +60,15 @@ RSpec.describe "Participants" do
         get root_path
 
         expect(flash[:alert]).to be_nil
+      end
+
+      it "does not render the install prompt on the sign in screen" do
+        get new_user_session_path
+
+        document = Nokogiri::HTML(response.body)
+
+        expect(document.at_css("[data-controller='install-prompt']")).to be_nil
+        expect(response.body).not_to include("Instale o Nutry.fit")
       end
     end
 
