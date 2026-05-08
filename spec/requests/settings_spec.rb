@@ -89,8 +89,10 @@ RSpec.describe "Settings" do
         get settings_account_cancellation_path
 
         document = Nokogiri::HTML(response.body)
+        back_link = document.at_css("a[aria-label='Voltar para configurações']")
 
-        expect(document.at_css("a[aria-label='Voltar para configurações']")).to be_present
+        expect(back_link).to be_present
+        expect(back_link["data-turbo"]).to eq("false")
         expect(response.body).not_to include("Abrir menu")
       end
 
@@ -133,8 +135,10 @@ RSpec.describe "Settings" do
         get edit_settings_password_path
 
         document = Nokogiri::HTML(response.body)
+        back_link = document.at_css("a[aria-label='Voltar para configurações']")
 
-        expect(document.at_css("a[aria-label='Voltar para configurações']")).to be_present
+        expect(back_link).to be_present
+        expect(back_link["data-turbo"]).to eq("false")
         expect(response.body).not_to include("Abrir menu")
       end
     end
@@ -196,8 +200,10 @@ RSpec.describe "Settings" do
       get edit_user_registration_path
 
       document = Nokogiri::HTML(response.body)
+      back_link = document.at_css("a[aria-label='Voltar para configurações']")
 
-      expect(document.at_css("a[aria-label='Voltar para configurações']")).to be_present
+      expect(back_link).to be_present
+      expect(back_link["data-turbo"]).to eq("false")
       expect(response.body).not_to include("Abrir menu")
     end
 
