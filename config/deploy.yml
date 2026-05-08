@@ -71,4 +71,4 @@ accessories:
       secret:
         - POSTGRES_PASSWORD
     volumes:
-      - "/mnt/postgres-data/nutry_fit_challenge:/var/lib/postgresql/data"
+      - "/mnt/postgres-data/nutry_fit_challenge:/var/lib/postgresql"
