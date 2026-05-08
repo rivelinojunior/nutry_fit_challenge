@@ -36,6 +36,9 @@ env:
     DATABASE_PORT: "5432"
     RAILS_LOG_LEVEL: "info"
     RAILS_ENV: "production"
+    MAILER_FROM_EMAIL: "support@nutry.fit"
+    SMTP_ADDRESS: "smtp.mailgun.org"
+    SMTP_PORT: 587
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 aliases:
