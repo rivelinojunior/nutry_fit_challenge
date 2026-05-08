@@ -45,7 +45,8 @@ module Admin
       {
         "recurrence_type" => "daily",
         "weekdays" => [],
-        "points" => 10
+        "points" => 10,
+        "links" => [ { "label" => "", "url" => "" } ]
       }
     end
 
@@ -90,7 +91,7 @@ module Admin
           :end_time,
           :recurrence_type,
           :specific_date,
-          { weekdays: [] }
+          { weekdays: [], links: [ [ :label, :url ] ] }
         ]
       )
       task_params[:weekdays] = selected_weekdays(task_params[:weekdays])

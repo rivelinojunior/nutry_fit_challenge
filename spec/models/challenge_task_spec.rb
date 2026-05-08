@@ -124,6 +124,66 @@ RSpec.describe ChallengeTask, type: :model do
         expect(challenge_task.errors[:allowed_end_time]).to include("must be greater than allowed start time")
       end
     end
+
+    context "with valid links" do
+      before do
+        challenge_task.links = [
+          { "label" => "Grupo do WhatsApp", "url" => "https://chat.example.com/grupo" }
+        ]
+      end
+
+      it { is_expected.to be_valid }
+    end
+
+    context "with links that are not a list" do
+      before { challenge_task.links = { "label" => "Grupo", "url" => "https://example.com" } }
+
+      it "adds a links error" do
+        challenge_task.validate
+
+        expect(challenge_task.errors[:links]).to include("must be a list")
+      end
+    end
+
+    context "with a link entry that is not a hash" do
+      before { challenge_task.links = [ "https://example.com" ] }
+
+      it "adds a links error" do
+        challenge_task.validate
+
+        expect(challenge_task.errors[:links]).to include("must include label and url")
+      end
+    end
+
+    context "with a link missing a label" do
+      before { challenge_task.links = [ { "label" => "", "url" => "https://example.com" } ] }
+
+      it "adds a links error" do
+        challenge_task.validate
+
+        expect(challenge_task.errors[:links]).to include("label can't be blank")
+      end
+    end
+
+    context "with a link missing a url" do
+      before { challenge_task.links = [ { "label" => "Grupo", "url" => "" } ] }
+
+      it "adds a links error" do
+        challenge_task.validate
+
+        expect(challenge_task.errors[:links]).to include("url can't be blank")
+      end
+    end
+
+    context "with a link using a non-http url" do
+      before { challenge_task.links = [ { "label" => "Arquivo", "url" => "ftp://example.com/arquivo" } ] }
+
+      it "adds a links error" do
+        challenge_task.validate
+
+        expect(challenge_task.errors[:links]).to include("url must start with http or https")
+      end
+    end
   end
 
   it "belongs to a challenge" do

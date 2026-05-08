@@ -1,12 +1,14 @@
 <section id="challenge_task_form" class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
   <% recurrence_type = task_form["recurrence_type"] %>
+  <% task_links = task_form.fetch("links", []) %>
+  <% task_links = [ { "label" => "", "url" => "" } ] if task_links.blank? %>
   <h2 class="text-lg font-semibold">Nova tarefa</h2>
 
   <%= form_with scope: :challenge_task,
                 url: challenge.present? ? admin_challenge_tasks_path(challenge) : "#",
                 method: :post,
                 class: "mt-5 grid gap-4",
-                data: { controller: "challenge-task-recurrence" } do |form| %>
+                data: { controller: "challenge-task-recurrence challenge-task-links" } do |form| %>
     <fieldset class="grid gap-4" <%= "disabled" if challenge.blank? || challenge_started %>>
       <div>
         <%= form.label :name, "Nome", class: "label" %>
@@ -84,6 +86,51 @@
       <div class="<%= "hidden" unless recurrence_type == "specific_date" %>" data-challenge-task-recurrence-target="specificDate">
         <%= form.label :specific_date, "Data específica", class: "label" %>
         <%= form.date_field :specific_date, value: task_form["specific_date"], min: challenge&.start_date, max: challenge&.end_date, class: "input input-bordered w-full", disabled: recurrence_type != "specific_date" %>
+      </div>
+
+      <div class="grid gap-3">
+        <div>
+          <span class="label">Links da tarefa</span>
+          <p class="text-xs text-base-content/60">Opcional. Use links completos começando com http ou https.</p>
+        </div>
+
+        <div class="grid gap-3" data-challenge-task-links-target="list">
+          <% task_links.each do |link| %>
+            <% link_label = link[:label].presence || link["label"] %>
+            <% link_url = link[:url].presence || link["url"] %>
+            <div class="grid gap-3 rounded-lg border border-base-300 p-3 sm:grid-cols-[1fr_1fr_auto]" data-challenge-task-links-target="row">
+              <label class="grid gap-1">
+                <span class="label">Nome do link</span>
+                <%= text_field_tag "challenge_task[links][][label]", link_label, class: "input input-bordered w-full", placeholder: "Grupo do WhatsApp" %>
+              </label>
+
+              <label class="grid gap-1">
+                <span class="label">URL</span>
+                <%= url_field_tag "challenge_task[links][][url]", link_url, class: "input input-bordered w-full", placeholder: "https://..." %>
+              </label>
+
+              <button type="button" class="btn btn-ghost btn-sm rounded-full self-end" data-action="challenge-task-links#remove">Remover</button>
+            </div>
+          <% end %>
+        </div>
+
+        <button type="button" class="btn btn-outline btn-sm rounded-full sm:w-fit" data-action="challenge-task-links#add">Adicionar link</button>
+
+        <template data-challenge-task-links-target="template">
+          <div class="grid gap-3 rounded-lg border border-base-300 p-3 sm:grid-cols-[1fr_1fr_auto]" data-challenge-task-links-target="row">
+            <label class="grid gap-1">
+              <span class="label">Nome do link</span>
+              <input type="text" name="challenge_task[links][][label]" class="input input-bordered w-full" placeholder="Grupo do WhatsApp">
+            </label>
+
+            <label class="grid gap-1">
+              <span class="label">URL</span>
+              <input type="url" name="challenge_task[links][][url]" class="input input-bordered w-full" placeholder="https://...">
+            </label>
+
+            <button type="button" class="btn btn-ghost btn-sm rounded-full self-end" data-action="challenge-task-links#remove">Remover</button>
+          </div>
+        </template>
       </div>
     </fieldset>
 

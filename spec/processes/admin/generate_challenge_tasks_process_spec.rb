@@ -27,6 +27,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
     let(:recurrence_type) { "daily" }
     let(:weekdays) { nil }
     let(:specific_date) { nil }
+    let(:links) { nil }
     let(:attributes) do
       {
         challenge_id:,
@@ -38,7 +39,8 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
         end_time:,
         recurrence_type:,
         weekdays:,
-        specific_date:
+        specific_date:,
+        links:
       }
     end
 
@@ -87,6 +89,23 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
           allowed_end_time: have_attributes(hour: 20, min: 0)
         )
       end
+
+      context "with links" do
+        let(:links) do
+          [
+            { label: "Grupo do WhatsApp", url: " https://chat.example.com/grupo " },
+            { label: "", url: "" }
+          ]
+        end
+
+        it "stores normalized links on every created task" do
+          result
+
+          expect(challenge.challenge_tasks.order(:scheduled_on).map(&:links)).to all(
+            eq([ { "label" => "Grupo do WhatsApp", "url" => "https://chat.example.com/grupo" } ])
+          )
+        end
+      end
     end
 
     context "with only required fields" do
@@ -114,6 +133,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
     context "with weekdays recurrence" do
       let(:recurrence_type) { "weekdays" }
       let(:weekdays) { [ 1, 3, 5 ] }
+      let(:links) { [ { "label" => "Planilha", "url" => "https://example.com/planilha" } ] }
 
       it "returns a created success" do
         expect(result).to be_success(:created)
@@ -124,6 +144,14 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
 
         expect(challenge.challenge_tasks.order(:scheduled_on).pluck(:scheduled_on)).to eq(
           [ start_date, start_date + 2.days, start_date + 4.days ]
+        )
+      end
+
+      it "stores links on selected weekday tasks" do
+        result
+
+        expect(challenge.challenge_tasks.order(:scheduled_on).map(&:links)).to all(
+          eq([ { "label" => "Planilha", "url" => "https://example.com/planilha" } ])
         )
       end
     end
@@ -148,6 +176,7 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
     context "with specific date recurrence" do
       let(:recurrence_type) { "specific_date" }
       let(:specific_date) { start_date + 3.days }
+      let(:links) { [ { label: "Vídeo", url: "https://example.com/video" } ] }
 
       it "returns a created success" do
         expect(result).to be_success(:created)
@@ -157,6 +186,12 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
         result
 
         expect(challenge.challenge_tasks.pluck(:scheduled_on)).to contain_exactly(start_date + 3.days)
+      end
+
+      it "stores links on the specific-date task" do
+        result
+
+        expect(challenge.challenge_tasks.first.links).to eq([ { "label" => "Vídeo", "url" => "https://example.com/video" } ])
       end
     end
 
@@ -407,6 +442,76 @@ RSpec.describe Admin::GenerateChallengeTasksProcess do
 
       it "does not create tasks" do
         expect { result }.not_to change(ChallengeTask, :count)
+      end
+    end
+
+    context "with blank link rows" do
+      let(:links) { [ { label: "", url: "" } ] }
+
+      it "creates tasks without links" do
+        result
+
+        expect(challenge.challenge_tasks.order(:scheduled_on).map(&:links)).to all(be_nil)
+      end
+    end
+
+    context "with links that are not a list" do
+      let(:links) { 1 }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors[:links]).to include("devem ser uma lista")
+      end
+    end
+
+    context "with a link entry that is not a hash" do
+      let(:links) { [ "https://example.com" ] }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors[:links]).to include("devem ter nome e URL")
+      end
+    end
+
+    context "with a link missing a label" do
+      let(:links) { [ { label: "", url: "https://example.com" } ] }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors[:links]).to include("devem ter nome e URL")
+      end
+    end
+
+    context "with a link missing a url" do
+      let(:links) { [ { label: "Grupo", url: "" } ] }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors[:links]).to include("devem ter nome e URL")
+      end
+    end
+
+    context "with a link using an invalid url scheme" do
+      let(:links) { [ { label: "Arquivo", url: "ftp://example.com/arquivo" } ] }
+
+      it "returns an invalid input failure" do
+        expect(result).to be_failure(:invalid_input)
+      end
+
+      it "returns a clear error" do
+        expect(result[:input].errors[:links]).to include("devem começar com http ou https")
       end
     end
 

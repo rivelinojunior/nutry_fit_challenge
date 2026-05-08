@@ -37,6 +37,44 @@ RSpec.describe "Admin challenge tasks" do
 
         expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
       end
+
+      context "with links" do
+        let(:challenge_task_params) do
+          {
+            name: "Beber água",
+            description: "Registrar consistência",
+            points: 10,
+            start_time: "08:00",
+            end_time: "20:00",
+            recurrence_type: "daily",
+            weekdays: [],
+            specific_date: nil,
+            links: [
+              { label: "Grupo do WhatsApp", url: "https://chat.example.com/grupo" }
+            ]
+          }
+        end
+
+        it "stores links on generated tasks" do
+          post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }
+
+          expect(challenge.challenge_tasks.order(:scheduled_on).map(&:links)).to all(
+            eq([ { "label" => "Grupo do WhatsApp", "url" => "https://chat.example.com/grupo" } ])
+          )
+        end
+
+        it "renders the link label in the admin task list" do
+          post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
+
+          expect(response.body).to include("Grupo do WhatsApp")
+        end
+
+        it "renders the link url in the admin task list" do
+          post admin_challenge_tasks_path(challenge), params: { challenge_task: challenge_task_params }, as: :turbo_stream
+
+          expect(response.body).to include('href="https://chat.example.com/grupo"')
+        end
+      end
     end
 
     context "with weekday recurrence" do

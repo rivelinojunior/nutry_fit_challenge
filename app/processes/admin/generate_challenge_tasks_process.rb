@@ -18,6 +18,7 @@ module Admin
       attribute :recurrence_type, :string
       attribute :weekdays
       attribute :specific_date, :date
+      attribute :links
 
       validates :challenge_id, :user_id, :name, :points, :recurrence_type, presence: true
       validates :points, numericality: { only_integer: true, greater_than: 0 }, allow_blank: true
@@ -39,12 +40,50 @@ module Admin
         end
 
         errors.add(:specific_date, :blank) if recurrence_type == "specific_date" && specific_date.blank?
+
+        if links.present?
+          if !links.respond_to?(:all?)
+            errors.add(:links, "devem ser uma lista")
+          else
+            links.each do |link|
+              errors.add(:links, "devem ter nome e URL") unless link.respond_to?(:key?)
+            end
+
+            normalized_links = Admin::GenerateChallengeTasksProcess.normalize_links(links)
+            normalized_links.each do |link|
+              errors.add(:links, "devem ter nome e URL") if link[:label].blank? || link[:url].blank?
+              errors.add(:links, "devem começar com http ou https") if link[:url].present? && !Admin::GenerateChallengeTasksProcess.http_url?(link[:url])
+            end
+          end
+        end
       end
     end
 
     deps do
       attribute :challenge_model, default: Challenge
       attribute :challenge_task_model, default: ChallengeTask
+    end
+
+    def self.normalize_links(links)
+      return [] if links.blank?
+
+      links.filter_map do |link|
+        next unless link.respond_to?(:key?)
+
+        label = link[:label].presence || link["label"]
+        url = link[:url].presence || link["url"]
+        next if label.blank? && url.blank?
+
+        { label: label&.strip, url: url&.strip }
+      end
+    end
+
+    def self.http_url?(url)
+      uri = URI.parse(url)
+
+      uri.is_a?(URI::HTTP) && uri.host.present?
+    rescue URI::InvalidURIError
+      false
     end
 
     def call(attributes)
@@ -104,6 +143,7 @@ module Admin
         points: attributes[:points],
         allowed_start_time: attributes[:start_time],
         allowed_end_time: attributes[:end_time],
+        links: self.class.normalize_links(attributes[:links]).presence,
         scheduled_on:
       }
     end

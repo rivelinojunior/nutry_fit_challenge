@@ -35,6 +35,17 @@
                       <%= task.allowed_start_time.strftime("%H:%M") %> até <%= task.allowed_end_time.strftime("%H:%M") %>
                     </p>
                   <% end %>
+                  <% if task.links.present? %>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      <% task.links.each do |link| %>
+                        <%= link_to link["label"],
+                                    link["url"],
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    class: "badge badge-outline" %>
+                      <% end %>
+                    </div>
+                  <% end %>
                 </div>
 
                 <%= button_to "Remover",
