@@ -34,6 +34,15 @@ RSpec.describe "Participants" do
       expect(response.body).to include("Abrir menu")
     end
 
+    it "renders the find challenge menu link" do
+      get join_path
+
+      document = Nokogiri::HTML(response.body)
+      link = document.at_css("a[href='/join']")
+
+      expect(link.text.squish).to eq("Encontrar desafio")
+    end
+
     it "renders the authenticated install prompt container" do
       get join_path
 
