@@ -43,6 +43,28 @@ RSpec.describe "Participants" do
       expect(link.text.squish).to eq("Encontrar desafio")
     end
 
+    it "does not render the admin menu link" do
+      get join_path
+
+      document = Nokogiri::HTML(response.body)
+
+      expect(document.at_css("a[href='#{admin_challenges_path}']")).to be_nil
+      expect(response.body).not_to include("Administração")
+    end
+
+    context "when the user is an admin" do
+      let(:user) { create(:user, :admin) }
+
+      it "renders the admin menu link" do
+        get join_path
+
+        document = Nokogiri::HTML(response.body)
+        link = document.at_css("a[href='#{admin_challenges_path}']")
+
+        expect(link.text.squish).to eq("Administração")
+      end
+    end
+
     it "renders the authenticated install prompt container" do
       get join_path
 
