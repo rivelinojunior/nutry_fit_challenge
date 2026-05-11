@@ -205,8 +205,14 @@ RSpec.describe Admin::UpdateChallengeProcess do
         }
       end
 
-      it "returns a challenge not found failure" do
-        expect(result).to be_failure(:challenge_not_found)
+      it "returns an updated success" do
+        expect(result).to be_success(:updated)
+      end
+
+      it "persists the updates" do
+        result
+
+        expect(challenge.reload).to have_attributes(name: "Desafio Atualizado", description: "Checklist atualizado")
       end
     end
   end

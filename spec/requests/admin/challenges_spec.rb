@@ -7,6 +7,130 @@ RSpec.describe "Admin::Challenges" do
     sign_in user
   end
 
+  describe "GET /admin/challenges" do
+    context "without an authenticated user" do
+      before do
+        sign_out user
+      end
+
+      it "redirects to sign in" do
+        get admin_challenges_path
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context "when the user is not an admin" do
+      let(:user) { create(:user) }
+
+      it "returns forbidden" do
+        get admin_challenges_path
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "with challenges" do
+      let(:other_user) { create(:user, :admin, name: "Outra Admin") }
+      let!(:own_challenge) do
+        create(
+          :challenge,
+          user:,
+          name: "Desafio próprio",
+          start_date: Date.current + 2.days,
+          end_date: Date.current + 8.days,
+          status: "draft"
+        )
+      end
+      let!(:other_challenge) do
+        create(
+          :challenge,
+          user: other_user,
+          name: "Desafio de outra pessoa",
+          start_date: Date.current - 1.day,
+          end_date: Date.current + 5.days,
+          status: "published"
+        )
+      end
+      let!(:finished_challenge) do
+        create(
+          :challenge,
+          user: other_user,
+          name: "Desafio encerrado",
+          start_date: Date.current - 10.days,
+          end_date: Date.current - 2.days,
+          status: "published"
+        )
+      end
+
+      it "returns ok" do
+        get admin_challenges_path
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "shows challenges from every admin" do
+        get admin_challenges_path
+
+        expect(response.body).to include("Desafio próprio")
+        expect(response.body).to include("Desafio de outra pessoa")
+      end
+
+      it "shows challenge details" do
+        get admin_challenges_path
+
+        expect(response.body).to include("Outra Admin")
+        expect(response.body).to include(own_challenge.challenge_code)
+        expect(response.body).to include(own_challenge.start_date.strftime("%d/%m/%Y"))
+        expect(response.body).to include(own_challenge.end_date.strftime("%d/%m/%Y"))
+      end
+
+      it "shows publication and temporal status labels" do
+        get admin_challenges_path
+
+        expect(response.body).to include("Rascunho")
+        expect(response.body).to include("Publicado")
+        expect(response.body).to include("Agendado")
+        expect(response.body).to include("Em andamento")
+        expect(response.body).to include("Encerrado")
+      end
+
+      it "links to challenge details" do
+        get admin_challenges_path
+
+        expect(response.body).to include(admin_challenge_path(other_challenge))
+        expect(response.body).to include("Ver desafio #{other_challenge.name}")
+      end
+
+      it "links to challenge editing" do
+        get admin_challenges_path
+
+        expect(response.body).to include(edit_admin_challenge_path(other_challenge))
+        expect(response.body).to include("Editar desafio #{other_challenge.name}")
+      end
+
+      it "links to the new challenge page" do
+        get admin_challenges_path
+
+        expect(response.body).to include(new_admin_challenge_path)
+      end
+    end
+
+    context "without challenges" do
+      it "shows the empty state" do
+        get admin_challenges_path
+
+        expect(response.body).to include("Nenhum desafio criado ainda.")
+      end
+
+      it "links to the new challenge page" do
+        get admin_challenges_path
+
+        expect(response.body).to include(new_admin_challenge_path)
+      end
+    end
+  end
+
   describe "GET /admin/challenges/new" do
     it "returns ok" do
       get new_admin_challenge_path
@@ -87,6 +211,22 @@ RSpec.describe "Admin::Challenges" do
         get admin_challenge_path(challenge)
 
         expect(response.body).to include(task.scheduled_on.strftime("%d/%m/%Y"))
+      end
+    end
+
+    context "with another user's challenge" do
+      let(:challenge) { create(:challenge, name: "Desafio externo") }
+
+      it "returns ok" do
+        get admin_challenge_path(challenge)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "shows the challenge" do
+        get admin_challenge_path(challenge)
+
+        expect(response.body).to include("Desafio externo")
       end
     end
 
@@ -184,6 +324,22 @@ RSpec.describe "Admin::Challenges" do
       get edit_admin_challenge_path(challenge)
 
       expect(response.body).to include("Desafio atual")
+    end
+
+    context "with another user's challenge" do
+      let(:challenge) { create(:challenge, name: "Desafio externo") }
+
+      it "returns ok" do
+        get edit_admin_challenge_path(challenge)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "shows the existing challenge name" do
+        get edit_admin_challenge_path(challenge)
+
+        expect(response.body).to include("Desafio externo")
+      end
     end
   end
 
@@ -289,19 +445,19 @@ RSpec.describe "Admin::Challenges" do
       expect(response.body).to include("End date must be greater than or equal to start date")
     end
 
-    it "does not update another user's challenge" do
+    it "updates another user's challenge" do
       other_challenge = create(:challenge, start_date: Date.current + 1.day, end_date: Date.current + 7.days)
 
-      expect do
-        patch admin_challenge_path(other_challenge), params: {
-          challenge: {
-            name: "Desafio externo",
-            description: "Checklist externo",
-            start_date: Date.current + 2.days,
-            end_date: Date.current + 10.days
-          }
+      patch admin_challenge_path(other_challenge), params: {
+        challenge: {
+          name: "Desafio externo",
+          description: "Checklist externo",
+          start_date: Date.current + 2.days,
+          end_date: Date.current + 10.days
         }
-      end.not_to change { other_challenge.reload.name }
+      }
+
+      expect(other_challenge.reload).to have_attributes(name: "Desafio externo", description: "Checklist externo")
     end
   end
 end

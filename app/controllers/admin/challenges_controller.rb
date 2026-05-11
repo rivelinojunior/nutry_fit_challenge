@@ -2,6 +2,10 @@ module Admin
   class ChallengesController < BaseController
     before_action :set_challenge, only: %i[show edit]
 
+    def index
+      @challenges = Challenge.includes(:user).order(start_date: :desc, created_at: :desc)
+    end
+
     def show
       @task_form = default_task_form
       @challenge_started = @challenge.present? && @challenge.start_date <= Date.current
@@ -42,7 +46,7 @@ module Admin
         add_base_errors(@challenge, errors)
         render :edit, status: :unprocessable_entity
       in Solid::Failure[type: :invalid_input, value: { input: }]
-        @challenge = current_user.challenges.find_by(id: params[:id])
+        @challenge = Challenge.find_by(id: params[:id])
         return redirect_to new_admin_challenge_path, alert: "Desafio não encontrado." unless @challenge
 
         @challenge.assign_attributes(challenge_params)
@@ -56,7 +60,7 @@ module Admin
     private
 
     def set_challenge
-      @challenge = current_user.challenges.find_by(id: params[:id])
+      @challenge = Challenge.find_by(id: params[:id])
     end
 
     def default_task_form

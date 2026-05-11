@@ -1,0 +1,82 @@
+<% content_for :title, "Desafios | Nutry.fit Challenge" %>
+
+<section class="mx-auto flex w-full max-w-5xl flex-col gap-6 py-4 sm:py-8">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-sm font-semibold text-primary">Admin</p>
+      <h1 class="mt-2 text-2xl font-bold tracking-normal text-base-content sm:text-3xl">Desafios</h1>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-base-content/70">
+        Acompanhe os desafios criados e acesse a configuração de cada um.
+      </p>
+    </div>
+
+    <%= link_to "Criar desafio", new_admin_challenge_path, class: "btn nutry-cta-gradient rounded-full sm:min-w-40" %>
+  </header>
+
+  <% if @challenges.any? %>
+    <div class="nutry-card overflow-hidden">
+      <div class="divide-y divide-base-300">
+        <% @challenges.each do |challenge| %>
+          <% temporal_label, temporal_class =
+            if challenge.end_date.present? && challenge.end_date < Date.current
+              [ "Encerrado", "badge-outline" ]
+            elsif challenge.start_date.present? && challenge.start_date <= Date.current
+              [ "Em andamento", "badge-warning" ]
+            else
+              [ "Agendado", "badge-outline" ]
+            end %>
+
+          <article class="grid gap-4 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-center sm:p-5">
+            <div class="min-w-0">
+              <h2 class="truncate text-base font-semibold text-base-content"><%= challenge.name %></h2>
+              <p class="mt-1 text-sm text-base-content/70">
+                <%= challenge.start_date.strftime("%d/%m/%Y") %> até <%= challenge.end_date.strftime("%d/%m/%Y") %>
+              </p>
+              <p class="mt-1 text-sm text-base-content/70">
+                Criado por <%= challenge.user.name.presence || challenge.user.email %>
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="badge <%= challenge.status == "published" ? "badge-success" : "badge-outline" %>">
+                <%= challenge.status == "published" ? "Publicado" : "Rascunho" %>
+              </span>
+              <span class="badge <%= temporal_class %>"><%= temporal_label %></span>
+              <span class="badge badge-primary font-mono"><%= challenge.challenge_code %></span>
+            </div>
+
+            <div class="flex items-center gap-2 sm:justify-self-end">
+              <%= link_to admin_challenge_path(challenge),
+                class: "btn btn-outline btn-square rounded-full",
+                aria: { label: "Ver desafio #{challenge.name}" },
+                title: "Ver desafio" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              <% end %>
+
+              <%= link_to edit_admin_challenge_path(challenge),
+                class: "btn btn-outline btn-square rounded-full",
+                aria: { label: "Editar desafio #{challenge.name}" },
+                title: "Editar desafio" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              <% end %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="nutry-card p-5 sm:p-6">
+      <p class="text-base font-semibold text-base-content">Nenhum desafio criado ainda.</p>
+      <p class="mt-2 text-sm leading-6 text-base-content/70">
+        Crie o primeiro desafio para definir tarefas e convidar participantes.
+      </p>
+      <%= link_to "Criar desafio", new_admin_challenge_path, class: "btn nutry-cta-gradient mt-5 rounded-full sm:min-w-40" %>
+    </div>
+  <% end %>
+</section>

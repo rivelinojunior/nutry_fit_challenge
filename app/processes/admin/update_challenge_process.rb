@@ -18,7 +18,7 @@ module Admin
     end
 
     def call(attributes)
-      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id], user_id: attributes[:user_id])
+      challenge = deps.challenge_model.find_by(id: attributes[:challenge_id])
       return Failure(:challenge_not_found) unless challenge
 
       return Failure(:already_started, challenge:, errors: [ ALREADY_STARTED_ERROR ]) if started?(challenge)
