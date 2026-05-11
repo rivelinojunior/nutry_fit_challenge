@@ -214,6 +214,26 @@ RSpec.describe "Admin::Challenges" do
       end
     end
 
+    context "with a started challenge" do
+      let(:challenge) { create(:challenge, user:, start_date: Date.current, end_date: Date.current + 7.days) }
+      let!(:task) { create(:challenge_task, challenge:, scheduled_on: challenge.start_date, name: "Caminhar") }
+
+      it "hides the generation form" do
+        get admin_challenge_path(challenge)
+
+        expect(response.body).not_to include("challenge_task_form")
+        expect(response.body).not_to include("Nova tarefa")
+        expect(response.body).not_to include("Adicionar Tarefa")
+      end
+
+      it "keeps the generated task list visible" do
+        get admin_challenge_path(challenge)
+
+        expect(response.body).to include("Tarefas geradas")
+        expect(response.body).to include("Caminhar")
+      end
+    end
+
     context "with another user's challenge" do
       let(:challenge) { create(:challenge, name: "Desafio externo") }
 

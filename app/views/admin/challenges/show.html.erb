@@ -13,7 +13,7 @@
           Código: <span class="font-mono"><%= @challenge.challenge_code %></span>
         </p>
       <% else %>
-        <p class="mt-1 text-sm text-base-content/70">Crie um desafio antes de gerar tarefas.</p>
+        <p class="mt-1 text-sm text-base-content/70">Nenhum desafio encontrado para este usuário.</p>
       <% end %>
     </div>
 
@@ -37,7 +37,9 @@
   <%= render "admin/challenge_tasks/flash", message: alert, kind: :alert %>
   <%= render "admin/challenge_tasks/errors", errors: [] %>
 
-  <%= render "admin/challenge_tasks/form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
+  <% if @challenge.present? && !@challenge_started %>
+    <%= render "admin/challenge_tasks/form", challenge: @challenge, task_form: @task_form, challenge_started: @challenge_started %>
+  <% end %>
 
   <%= render "admin/challenge_tasks/task_list", challenge: @challenge, tasks_by_date: @tasks_by_date, challenge_started: @challenge_started %>
 </section>
