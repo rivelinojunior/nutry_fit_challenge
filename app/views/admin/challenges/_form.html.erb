@@ -92,7 +92,7 @@
       </div>
 
       <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-        <%= link_to "Cancelar", edit_admin_challenge_path(challenge), class: "btn btn-ghost rounded-full" if challenge.persisted? %>
+        <%= link_to "Voltar", admin_challenges_path, class: "btn btn-ghost rounded-full" if challenge.persisted? %>
         <%= form.submit submit_label, class: "btn nutry-cta-gradient rounded-full sm:min-w-48" %>
       </div>
     <% end %>

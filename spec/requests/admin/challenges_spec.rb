@@ -326,6 +326,13 @@ RSpec.describe "Admin::Challenges" do
       expect(response.body).to include("Desafio atual")
     end
 
+    it "links back to the challenge list" do
+      get edit_admin_challenge_path(challenge)
+
+      document = Nokogiri::HTML(response.body)
+      expect(document.at_css("a[href='#{admin_challenges_path}']")&.text).to eq("Voltar")
+    end
+
     context "with another user's challenge" do
       let(:challenge) { create(:challenge, name: "Desafio externo") }
 
